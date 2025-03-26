@@ -24,6 +24,11 @@ Make sure you have the following installed:
 
 ---
 
+## Pull Repo
+- Open your folder in terminal or ide
+- run
+    git clone https://github.com/JessicaCodesx/COSC3506_EventManagementSystem.git
+
 ## Frontend Setup (React + Vite)
 
 cd frontend  

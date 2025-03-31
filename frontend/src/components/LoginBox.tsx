@@ -1,6 +1,10 @@
 import { ReactNode } from "react";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 
+interface Props {
+  loginClicked: (ev: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
 const LoginBox = () => {
   return (
     <form>
@@ -58,7 +62,7 @@ const LoginBox = () => {
         </div>
 
         <div className="mx-auto mt-5 me-5">
-          <button className="btn btn-primary"> Login </button>
+          <button className="btn btn-primary">Login</button>
         </div>
         <div className="ms-auto mt-auto">
           <label

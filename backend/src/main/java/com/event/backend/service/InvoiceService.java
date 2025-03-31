@@ -1,12 +1,13 @@
 package com.event.backend.service;
 
-import com.event.backend.model.Invoice;
-import com.event.backend.repository.InvoiceRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.event.backend.model.Invoice;
+import com.event.backend.repository.InvoiceRepository;
 
 @Service
 public class InvoiceService {
@@ -32,6 +33,15 @@ public class InvoiceService {
 
     public List<Invoice> getAll() {
         return repository.findAll();
+    }
+
+    public Invoice update(Long id, Invoice invoiceDetails) {
+        return repository.findById(id).map(invoice -> {
+            invoice.setTotalAmount(invoiceDetails.getTotalAmount());
+            invoice.setStatus(invoiceDetails.getStatus());
+            invoice.setDueDate(invoiceDetails.getDueDate());
+            return repository.save(invoice);
+        }).orElse(null);
     }
 
     public void delete(Long id) {

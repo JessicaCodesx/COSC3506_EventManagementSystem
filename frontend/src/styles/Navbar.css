@@ -1,0 +1,155 @@
+/* Navbar.css */
+
+.navbar {
+    background-color: #fff;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+  }
+  
+  .navbar-logo {
+    color: #4a6fff;
+    font-size: 2rem;
+    font-weight: bold;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    height: 80px;
+    padding: 0 1rem;
+  }
+  
+  .nav-link {
+    color: #333;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    color: #4a6fff;
+  }
+  
+  .menu-icon {
+    display: none;
+  }
+  
+  .btn-login, .btn-signup, .btn-logout {
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+  }
+  
+  .btn-login {
+    background-color: transparent;
+    color: #4a6fff;
+    border: 2px solid #4a6fff;
+  }
+  
+  .btn-login:hover {
+    background-color: rgba(74, 111, 255, 0.1);
+  }
+  
+  .btn-signup, .btn-logout {
+    background-color: #4a6fff;
+    color: white;
+    margin-left: 10px;
+  }
+  
+  .btn-signup:hover, .btn-logout:hover {
+    background-color: #3a5be0;
+  }
+  
+  .btn-logout {
+    background-color: #ff4a4a;
+  }
+  
+  .btn-logout:hover {
+    background-color: #e03a3a;
+  }
+  
+  /* Media Queries */
+  @media screen and (max-width: 960px) {
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: calc(100vh - 80px);
+      position: absolute;
+      top: 80px;
+      left: -100%;
+      opacity: 0;
+      transition: all 0.5s ease;
+      padding: 0;
+    }
+  
+    .nav-menu.active {
+      background: #fff;
+      left: 0;
+      opacity: 1;
+      transition: all 0.5s ease;
+      z-index: 1;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+  
+    .nav-item {
+      height: 60px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+  
+    .nav-link {
+      text-align: center;
+      padding: 1.5rem;
+      width: 100%;
+      display: table;
+    }
+  
+    .menu-icon {
+      display: block;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+  
+    .fa-times {
+      color: #ff4a4a;
+    }
+  
+    .btn-login, .btn-signup, .btn-logout {
+      width: 90%;
+      margin: 5px auto;
+    }
+  }

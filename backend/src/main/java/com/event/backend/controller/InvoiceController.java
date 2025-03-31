@@ -41,6 +41,13 @@ public class InvoiceController {
         return service.getByEventId(eventId);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Invoice> updateInvoice(@PathVariable Long id, @RequestBody Invoice invoice) {
+        Invoice updated = service.update(id, invoice);
+        if (updated != null) return ResponseEntity.ok(updated);
+        return ResponseEntity.notFound().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         service.delete(id);

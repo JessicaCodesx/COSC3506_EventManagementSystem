@@ -1,52 +1,161 @@
-import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
-import Appbar from "./components/Appbar.tsx";
-import HomePage from "./components/HomePage.tsx";
-import EventForm from "./components/EventForm.tsx";
-import LoginPage from "./components/LoginPage.tsx";
+// Public pages
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import UnauthorizedPage from './pages/UnauthorizedPage';
+import NotFoundPage from './pages/NotFoundPage';
+import FeaturesPage from './pages/FeaturesPage';
+import PricingPage from './pages/PricingPage';
+import ContactPage from './pages/ContactPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 
-import Box from "@mui/material/Box";
+// Dashboard pages
+import DashboardPage from './pages/DashboardPage';
 
-import "./App.css";
+// Event pages
+import EventsListPage from './pages/EventsListPage';
+import CreateEventPage from './pages/CreateEventPage';
+import EventDetailsPage from './pages/EventDetailsPage';
+import EditEventPage from './pages/EditEventPage';
+import EventAssignmentPage from './pages/EventAssignmentPage';
 
-function App() {
-  const [isLoggedIn, setLogin] = useState(false);
+// Invoice pages
+import InvoicesListPage from './pages/InvoicesListPage';
+import CreateInvoicePage from './pages/CreateInvoicePage';
+import InvoiceDetailsPage from './pages/InvoiceDetailsPage';
+import PaymentPage from './pages/PaymentPage';
 
-  const darkTheme = createTheme({
-    palette: {
-      mode: "light",
-    },
-  });
+// Profile page
+import ProfilePage from './pages/ProfilePage';
 
-  const handleLogin = () => {
-    setLogin(true);
-  };
+import './styles/App.css';
 
+const App: React.FC = () => {
   return (
-    <>
-      <ThemeProvider theme={darkTheme}>
-        {!isLoggedIn && <LoginPage />}
-        {isLoggedIn && (
-          <div>
-            <Appbar></Appbar>
-            <Box component="section" sx={{ p: 5 }}>
-              <BrowserRouter>
-                <div>
-                  <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/New" element={<EventForm />} />
-                  </Routes>
-                </div>
-              </BrowserRouter>
-            </Box>
-          </div>
-        )}
-      </ThemeProvider>
-    </>
+    <AuthProvider>
+      <Router>
+        <div className="app">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
+            <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            
+            {/* Dashboard route */}
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Event routes */}
+            <Route 
+              path="/events" 
+              element={
+                <ProtectedRoute>
+                  <EventsListPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/events/create" 
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'CLIENT']}>
+                  <CreateEventPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/events/:eventId" 
+              element={
+                <ProtectedRoute>
+                  <EventDetailsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/events/:eventId/assign" 
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'CLIENT']}>
+                  <EventAssignmentPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/events/:eventId/edit" 
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'CLIENT']}>
+                  <EditEventPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Invoice routes */}
+            <Route 
+              path="/invoices" 
+              element={
+                <ProtectedRoute>
+                  <InvoicesListPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/invoices/create" 
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'CLIENT']}>
+                  <CreateInvoicePage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/invoices/:invoiceId" 
+              element={
+                <ProtectedRoute>
+                  <InvoiceDetailsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/invoices/:invoiceId/pay" 
+              element={
+                <ProtectedRoute allowedRoles={['CLIENT']}>
+                  <PaymentPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Profile route */}
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Catch all route - 404 */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
-}
+};
 
 export default App;

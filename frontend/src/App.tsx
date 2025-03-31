@@ -5,6 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import Appbar from "./components/Appbar.tsx";
 import HomePage from "./components/HomePage.tsx";
+import ProfilePage from "./components/ProfilePage.tsx";
 import EventForm from "./components/EventForm.tsx";
 import LoginPage from "./components/LoginPage.tsx";
 
@@ -13,7 +14,7 @@ import Box from "@mui/material/Box";
 import "./App.css";
 
 function App() {
-  const [isLoggedIn, setLogin] = useState(false);
+  const [isLoggedIn, setLogin] = useState(true);
 
   const darkTheme = createTheme({
     palette: {
@@ -37,6 +38,7 @@ function App() {
                 <div>
                   <Routes>
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/Profile" element={<ProfilePage />} />
                     <Route path="/New" element={<EventForm />} />
                   </Routes>
                 </div>

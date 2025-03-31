@@ -32,9 +32,9 @@ function App() {
         {!isLoggedIn && <LoginPage />}
         {isLoggedIn && (
           <div>
-            <Appbar></Appbar>
-            <Box component="section" sx={{ p: 5 }}>
-              <BrowserRouter>
+            <BrowserRouter>
+              <Appbar></Appbar>
+              <Box component="section" sx={{ p: 5 }}>
                 <div>
                   <Routes>
                     <Route path="/" element={<HomePage />} />
@@ -42,8 +42,8 @@ function App() {
                     <Route path="/New" element={<EventForm />} />
                   </Routes>
                 </div>
-              </BrowserRouter>
-            </Box>
+              </Box>
+            </BrowserRouter>
           </div>
         )}
       </ThemeProvider>

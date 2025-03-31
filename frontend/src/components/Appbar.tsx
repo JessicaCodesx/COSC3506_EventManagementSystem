@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import { useNavigate } from "react-router-dom";
 
 const pages = ["Explore", "My Events"];
 const settings = ["Profile", "Logout"];
@@ -35,6 +36,13 @@ function ResponsiveAppBar() {
     setAnchorElNav(null);
   };
 
+  const navigate = useNavigate();
+
+  const handleUserMenuClick = (setting: string) => {
+    navigate("/" + setting);
+    handleCloseUserMenu();
+  };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -50,7 +58,7 @@ function ResponsiveAppBar() {
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -133,7 +141,7 @@ function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="USER NAME" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="John Smith" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
             <Menu
@@ -153,7 +161,10 @@ function ResponsiveAppBar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem
+                  key={setting}
+                  onClick={() => handleUserMenuClick(setting)}
+                >
                   <Typography sx={{ textAlign: "center" }}>
                     {setting}
                   </Typography>

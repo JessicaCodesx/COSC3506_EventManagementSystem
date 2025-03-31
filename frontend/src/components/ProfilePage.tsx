@@ -93,7 +93,7 @@ function ProfilePage() {
                   <Typography variant="h4">Event History</Typography>
 
                   {userEventHistory.map((event, index) => (
-                    <div className="card border rounded p-3 my-3">
+                    <div className="card border rounded p-3 my-3" key={index}>
                       <Typography variant="h5">{event.Name}</Typography>
 
                       <div className="d-flex">

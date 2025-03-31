@@ -64,6 +64,7 @@ const LoginBox = () => {
         <div className="mx-auto mt-5 me-5">
           <button className="btn btn-primary">Login</button>
         </div>
+
         <div className="ms-auto mt-auto">
           <label
             className="text-secondary-emphasis fw-bold"

@@ -25,6 +25,7 @@ import EventDetailsPage from './pages/EventDetailsPage';
 import EditEventPage from './pages/EditEventPage';
 import EventAssignmentPage from './pages/EventAssignmentPage';
 
+
 // Invoice pages
 import InvoicesListPage from './pages/InvoicesListPage';
 import CreateInvoicePage from './pages/CreateInvoicePage';
@@ -38,6 +39,7 @@ import './styles/App.css';
 
 const App: React.FC = () => {
   return (
+
     <AuthProvider>
       <Router>
         <div className="app">
@@ -155,6 +157,7 @@ const App: React.FC = () => {
         </div>
       </Router>
     </AuthProvider>
+    
   );
 };
 

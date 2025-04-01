@@ -1,59 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/DashboardModules.css';
+import { useAuth } from "../../contexts/AuthContext";
+import {
+  User,
+  Event,
+  Invoice,
+  EventService,
+  UserService,
+  InvoiceService,
+} from "../../services/apiService";
 
-const mockEvents = [
-  { 
-    id: 1, 
-    eventName: 'Annual Corporate Retreat', 
-    location: 'Mountain View Resort', 
-    eventDate: '2025-06-15T14:00:00', 
-    status: 'SCHEDULED' 
-  },
-  { 
-    id: 2, 
-    eventName: 'Product Launch', 
-    location: 'Downtown Convention Center', 
-    eventDate: '2025-05-10T09:00:00', 
-    status: 'SCHEDULED' 
-  },
-  { 
-    id: 3, 
-    eventName: 'Team Building Workshop', 
-    location: 'Adventure Park', 
-    eventDate: '2025-04-22T10:00:00', 
-    status: 'COMPLETED' 
-  }
-];
-
-const mockInvoices = [
-  { 
-    id: 101, 
-    eventId: 1, 
-    totalAmount: 5200.00, 
-    status: 'PENDING', 
-    dueDate: '2025-05-15' 
-  },
-  { 
-    id: 102, 
-    eventId: 2, 
-    totalAmount: 3750.00, 
-    status: 'PAID', 
-    dueDate: '2025-04-10' 
-  },
-  { 
-    id: 103, 
-    eventId: 3, 
-    totalAmount: 1500.00, 
-    status: 'PAID', 
-    dueDate: '2025-03-22' 
-  }
-];
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import PersonIcon from '@mui/icons-material/Person';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
+import RequestPageIcon from '@mui/icons-material/RequestPage';
+import StoreIcon from '@mui/icons-material/Store';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const ClientDashboard: React.FC = () => {
-  const [upcomingEvents, setUpcomingEvents] = useState(mockEvents);
-  const [recentInvoices, setRecentInvoices] = useState(mockInvoices);
   const [loading, setLoading] = useState(false);
+
+  const { user, role } = useAuth();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setEvents(await EventService.getAllEvents());
+      } catch (err: any) {}
+    };
+
+    fetchEvents();
+
+    const fetchInvoice = async () => {
+      try {
+        setInvoices(await InvoiceService.getAllInvoices());
+      } catch (err: any) {}
+    };
+
+    fetchInvoice();
+  }, [role, user?.id]);
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -95,27 +87,27 @@ const ClientDashboard: React.FC = () => {
       <div className="dashboard-summary">
         <div className="summary-card">
           <div className="summary-icon events-icon">
-            <i className="fa fa-calendar"></i>
+            <CalendarMonthIcon />
           </div>
           <div className="summary-details">
-            <h3>{upcomingEvents.filter(e => e.status === 'SCHEDULED').length}</h3>
+            <h3>{events.filter(e => e.status === 'SCHEDULED').length}</h3>
             <p>Upcoming Events</p>
           </div>
         </div>
 
         <div className="summary-card">
           <div className="summary-icon invoices-icon">
-            <i className="fa fa-file-invoice-dollar"></i>
+            <RequestPageIcon />
           </div>
           <div className="summary-details">
-            <h3>{recentInvoices.filter(i => i.status === 'PENDING').length}</h3>
+            <h3>{invoices.filter(i => i.status === 'PENDING').length}</h3>
             <p>Pending Invoices</p>
           </div>
         </div>
 
         <div className="summary-card">
           <div className="summary-icon vendors-icon">
-            <i className="fa fa-store"></i>
+            <StoreIcon />
           </div>
           <div className="summary-details">
             <h3>5</h3>
@@ -129,14 +121,14 @@ const ClientDashboard: React.FC = () => {
           <div className="widget-header">
             <h2>Upcoming Events</h2>
             <Link to="/events" className="view-all-link">
-              View All <i className="fa fa-arrow-right"></i>
+              View All <ArrowForwardIcon />
             </Link>
           </div>
           
           <div className="widget-content">
             {loading ? (
               <div className="loading-spinner">Loading...</div>
-            ) : upcomingEvents.length > 0 ? (
+            ) : events.length > 0 ? (
               <table className="data-table">
                 <thead>
                   <tr>
@@ -148,7 +140,7 @@ const ClientDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {upcomingEvents.map(event => (
+                  {events.map(event => (
                     <tr key={event.id}>
                       <td>{event.eventName}</td>
                       <td>{formatDate(event.eventDate)}</td>
@@ -160,7 +152,7 @@ const ClientDashboard: React.FC = () => {
                       </td>
                       <td>
                         <Link to={`/events/${event.id}`} className="action-button">
-                          <i className="fa fa-eye"></i>
+                          <VisibilityIcon />
                         </Link>
                       </td>
                     </tr>
@@ -169,7 +161,7 @@ const ClientDashboard: React.FC = () => {
               </table>
             ) : (
               <div className="empty-state">
-                <i className="fa fa-calendar-plus"></i>
+                <EditCalendarIcon />
                 <p>No upcoming events found</p>
                 <Link to="/events/create" className="btn-primary">
                   Create an Event
@@ -183,14 +175,14 @@ const ClientDashboard: React.FC = () => {
           <div className="widget-header">
             <h2>Recent Invoices</h2>
             <Link to="/invoices" className="view-all-link">
-              View All <i className="fa fa-arrow-right"></i>
+              View All <ArrowForwardIcon />
             </Link>
           </div>
           
           <div className="widget-content">
             {loading ? (
               <div className="loading-spinner">Loading...</div>
-            ) : recentInvoices.length > 0 ? (
+            ) : invoices.length > 0 ? (
               <table className="data-table">
                 <thead>
                   <tr>
@@ -202,7 +194,7 @@ const ClientDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentInvoices.map(invoice => (
+                  {invoices.map(invoice => (
                     <tr key={invoice.id}>
                       <td>INV-{invoice.id}</td>
                       <td>${invoice.totalAmount.toFixed(2)}</td>
@@ -214,11 +206,11 @@ const ClientDashboard: React.FC = () => {
                       </td>
                       <td>
                         <Link to={`/invoices/${invoice.id}`} className="action-button">
-                          <i className="fa fa-eye"></i>
+                          <VisibilityIcon/>
                         </Link>
                         {invoice.status === 'PENDING' && (
                           <Link to={`/invoices/${invoice.id}/pay`} className="action-button pay-button">
-                            <i className="fa fa-credit-card"></i>
+                            <CreditCardIcon/>
                           </Link>
                         )}
                       </td>
@@ -228,7 +220,7 @@ const ClientDashboard: React.FC = () => {
               </table>
             ) : (
               <div className="empty-state">
-                <i className="fa fa-file-invoice"></i>
+                <ReceiptIcon/>
                 <p>No invoices found</p>
               </div>
             )}
@@ -239,7 +231,7 @@ const ClientDashboard: React.FC = () => {
       <div className="dashboard-actions">
         <Link to="/events/create" className="action-card">
           <div className="action-icon">
-            <i className="fa fa-plus-circle"></i>
+            <AddCircleOutlineIcon/>
           </div>
           <div className="action-details">
             <h3>Create New Event</h3>
@@ -249,7 +241,7 @@ const ClientDashboard: React.FC = () => {
         
         <Link to="/profile" className="action-card">
           <div className="action-icon">
-            <i className="fa fa-user-edit"></i>
+            <PersonIcon />
           </div>
           <div className="action-details">
             <h3>Update Profile</h3>

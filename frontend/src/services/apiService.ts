@@ -1,5 +1,7 @@
 import axios from 'axios';
-import { MOCK_INVOICES, MockUserService, MockEventService } from './mockApiService';
+import { MockInvoiceService, MockUserService, MockEventService, MockAssignmentService } from './mockApiService';
+
+const useMockServices = true;
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -20,6 +22,55 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+export interface Event {
+  id: number;
+  eventName: string;
+  location: string;
+  eventDate: string;
+  status: string;
+  description?: string;
+  client?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
+
+export interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  role: string;
+};
+
+export interface Invoice {
+  id: number;
+  status: string;
+  totalAmount: number;
+};
+
+export interface Assignment {
+  id: number;
+  event: {
+    id: number;
+  };
+  vendor?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  staff?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  role: string;
+}
+
 
 export const AuthService = {
   login: async (email: string, password: string) => {
@@ -60,22 +111,24 @@ export const UserService = {
   },
 
   createUser: async (userData: any) => {
-    // note - update when endpoint works
-    return MockUserService.createUser(userData);
+    if(useMockServices)
+      return MockUserService.createUser(userData);
 
     const response = await api.post('/users', userData);
     return response.data;
   },
   
   updateProfile: async (userData: any) => {
-    return MockUserService.updateProfile(userData);
+    if(useMockServices)
+      return MockUserService.updateProfile(userData);
     
     const response = await api.put('/users/profile', userData);
     return response.data;
   },
   
   getAllUsers: async () => {
-    return MockUserService.getAllUsers();
+    if(useMockServices)
+      return MockUserService.getAllUsers();
 
     const response = await api.get('/users');
     return response.data;
@@ -89,24 +142,32 @@ export const UserService = {
 
 export const EventService = {
   createEvent: async (eventData: any) => {
+    if(useMockServices)
+      return MockEventService.createEvent(eventData);
+
     const response = await api.post('/events', eventData);
     return response.data;
   },
   
   getAllEvents: async () => {
-    return MockEventService.getAllEvents();
+    if(useMockServices)
+      return MockEventService.getAllEvents();
     // const response = await api.get('/events');
     // return response.data;
   },
   
   getEventById: async (id: number) => {
-    return MockEventService.getEventById(id);
+    if(useMockServices)
+      return MockEventService.getEventById(id);
 
     const response = await api.get(`/events/${id}`);
     return response.data;
   },
   
   getEventsByClientId: async (clientId: number) => {
+    if(useMockServices)
+      return MockEventService.getEventsByClientId(clientId);
+
     const response = await api.get(`/events/client/${clientId}`);
     return response.data;
   },
@@ -124,26 +185,41 @@ export const EventService = {
 
 export const AssignmentService = {
   createAssignment: async (assignmentData: any) => {
+    if(useMockServices)
+      return MockAssignmentService.createAssignment(assignmentData);
+
     const response = await api.post('/assignments', assignmentData);
     return response.data;
   },
   
   getAssignmentsByEvent: async (eventId: number) => {
+    if(useMockServices)
+      return MockAssignmentService.getAssignmentsByEvent(eventId);
+
     const response = await api.get(`/assignments/event/${eventId}`);
     return response.data;
   },
   
   getAssignmentsByVendor: async (vendorId: number) => {
+    if(useMockServices)
+      return MockAssignmentService.getAssignmentsByVendor(vendorId);
+
     const response = await api.get(`/assignments/vendor/${vendorId}`);
     return response.data;
   },
   
   getAssignmentsByStaff: async (staffId: number) => {
+    if(useMockServices)
+      return MockAssignmentService.getAssignmentsByStaff(staffId);
+
     const response = await api.get(`/assignments/staff/${staffId}`);
     return response.data;
   },
   
   deleteAssignment: async (id: number) => {
+        if(useMockServices)
+      return MockAssignmentService.deleteAssignment(id);
+
     const response = await api.delete(`/assignments/${id}`);
     return response.data;
   }
@@ -151,37 +227,56 @@ export const AssignmentService = {
 
 export const InvoiceService = {
   createInvoice: async (invoiceData: any) => {
-    const response = await api.post('/invoices', invoiceData);
-    return response.data;
+    if(useMockServices)
+      return MockInvoiceService.createInvoice(invoiceData);
+      const response = await api.post('/invoices', invoiceData);
+      return response.data;
   },
   
   getAllInvoices: async () => {
-    return MOCK_INVOICES;
+    if(useMockServices)
+      return MockInvoiceService.getAllInvoices();
+
     const response = await api.get('/invoices');
     return response.data;
   },
   
   getInvoiceById: async (id: number) => {
+    if(useMockServices)
+      return MockInvoiceService.getInvoiceById(id);
+
     const response = await api.get(`/invoices/${id}`);
     return response.data;
   },
   
   getInvoicesByClient: async (clientId: number) => {
+    if(useMockServices)
+      return MockInvoiceService.getInvoicesByClient(clientId);
+
     const response = await api.get(`/invoices/client/${clientId}`);
     return response.data;
   },
   
   getInvoicesByEvent: async (eventId: number) => {
+    if(useMockServices)
+      return MockInvoiceService.getInvoicesByEvent(eventId);
+
     const response = await api.get(`/invoices/event/${eventId}`);
     return response.data;
   },
   
   updateInvoice: async (id: number, invoiceData: any) => {
+    if(useMockServices)
+      return MockInvoiceService.updateInvoice(id, invoiceData);
+
     const response = await api.put(`/invoices/${id}`, invoiceData);
     return response.data;
   },
   
   deleteInvoice: async (id: number) => {
+    if(useMockServices)
+      return MockInvoiceService.deleteInvoice(id);
+
     const response = await api.delete(`/invoices/${id}`);
     return response.data;
   }

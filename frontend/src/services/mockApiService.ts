@@ -33,7 +33,7 @@ const MOCK_USERS = [
   }
 ];
 
-export const MOCK_EVENTS = [
+const MOCK_EVENTS = [
   {
     id: 1,
     eventName: 'Annual Corporate Retreat',
@@ -56,7 +56,7 @@ export const MOCK_EVENTS = [
     eventDate: '2025-05-10T09:00:00',
     status: 'SCHEDULED',
     client: {
-      id: 2,
+      id: 25,
       firstName: 'Client',
       lastName: 'User',
       email: 'client@example.com',
@@ -71,7 +71,7 @@ export const MOCK_EVENTS = [
     eventDate: '2025-04-22T10:00:00',
     status: 'COMPLETED',
     client: {
-      id: 2,
+      id: 25,
       firstName: 'Client',
       lastName: 'User',
       email: 'client@example.com',
@@ -81,7 +81,7 @@ export const MOCK_EVENTS = [
   }
 ];
 
-export const MOCK_INVOICES = [
+const MOCK_INVOICES = [
   {
     id: 101,
     event: { 
@@ -128,6 +128,25 @@ export const MOCK_INVOICES = [
     dueDate: '2025-03-22'
   }
 ];
+
+const MOCK_ASSIGNMENTS = [
+  {
+    id: 1,
+    event: {
+      id: 1,
+    },
+    vendor: {
+      id: 1,
+      firstName: "Catering",
+      lastName: "Essentials",
+      email: "catering.essentials@exsample.com",
+    },
+    staff: {
+      id: 1
+    },
+    role: "Catering"
+  }
+]
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -320,6 +339,128 @@ export const MockEventService = {
     }
     
     MOCK_EVENTS.splice(eventIndex, 1);
+    
+    return { success: true };
+  }
+};
+
+export const MockInvoiceService = {
+  createInvoice: async (invoiceData: any) => {
+    await delay(300);
+    
+    const newInvoice = {
+      id: MOCK_INVOICES.length + 1,
+      ...invoiceData
+    };
+    
+    MOCK_INVOICES.push(newInvoice);
+    
+    return newInvoice;
+  },
+  
+  getAllInvoices: async () => {
+    await delay(300);
+    return [...MOCK_INVOICES];
+  },
+  
+  getInvoiceById: async (id: number) => {
+    await delay(200);
+    
+    const invoice = MOCK_INVOICES.find(e => e.id === id);
+    
+    if (!invoice) {
+      throw new Error('Invoice not found');
+    }
+    
+    return invoice
+  },
+  
+  getInvoicesByClient: async (clientId: number) => {
+    await delay(300);
+    
+    return MOCK_INVOICES.filter(e => e.client && e.client.id === clientId);
+  },
+
+  getInvoicesByEvent: async (eventId: number) => {
+    await delay(300);
+    
+    return MOCK_INVOICES.filter(e => e.event && e.event.id === eventId);
+  },
+  
+  updateInvoice: async (id: number, invoiceData: any) => {
+    await delay(300);
+    
+    const index = MOCK_INVOICES.findIndex(e => e.id === id);
+    
+    if (index === -1) {
+      throw new Error('Event not found');
+    }
+    
+    MOCK_INVOICES[index] = {
+      ...MOCK_INVOICES[index],
+      ...invoiceData
+    };
+    
+    return MOCK_EVENTS[index];
+  },
+  
+  deleteInvoice: async (id: number) => {
+    await delay(300);
+    
+    const index = MOCK_INVOICES.findIndex(e => e.id === id);
+    
+    if (index === -1) {
+      throw new Error('Invoice not found');
+    }
+    
+    MOCK_INVOICES.splice(index, 1);
+    
+    return { success: true };
+  }
+};
+
+export const MockAssignmentService = {
+  createAssignment: async (assignmentData: any) => {
+    await delay(300);
+    
+    const newAssignment = {
+      id: MOCK_INVOICES.length + 1,
+      ...assignmentData
+    };
+    
+    MOCK_ASSIGNMENTS.push(newAssignment);
+    
+    return newAssignment;
+  },
+
+  getAssignmentsByEvent: async (eventId: number) => {
+    await delay(300);
+    
+    return MOCK_ASSIGNMENTS.filter(e => e.event && e.event.id === eventId);
+  },
+
+  getAssignmentsByVendor: async (vendorId: number) => {
+    await delay(300);
+    
+    return MOCK_ASSIGNMENTS.filter(e => e.vendor && e.vendor.id === vendorId);
+  },
+
+  getAssignmentsByStaff: async (staffId: number) => {
+    await delay(300);
+    
+    return MOCK_ASSIGNMENTS.filter(e => e.staff && e.staff.id === staffId);
+  },
+  
+  deleteAssignment: async (id: number) => {
+    await delay(300);
+    
+    const index = MOCK_ASSIGNMENTS.findIndex(e => e.id === id);
+    
+    if (index === -1) {
+      throw new Error('Asignment not found');
+    }
+    
+    MOCK_ASSIGNMENTS.splice(index, 1);
     
     return { success: true };
   }

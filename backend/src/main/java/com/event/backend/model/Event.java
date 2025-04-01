@@ -3,6 +3,7 @@ package com.event.backend.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import com.event.backend.model.Vendor; // Import Vendor class
 
 @Entity
 @Table(name = "events")
@@ -14,39 +15,31 @@ public class Event {
 
     private String eventName;
     private String location;
-     // new fields for pricing
-   
 
-    // Removed duplicate field declaration for 'client'
+    @Enumerated(EnumType.STRING)
+    private EventStatus status; // Enum to track event status
 
-   
+    @ManyToOne
+    @JoinColumn(name = "vendor_id")
+    private Vendor vendor; // Relationship with Vendor
 
-    //getters and setters
-    // Removed duplicate getter and setter for pricingType
-    // Removed duplicate method setBasePrice(Double basePrice)
-
-    
-    public enum EventStatus {
-        PENDING,
-        CONFIRMED,
-        CANCELLED
-    }
-    
-    // Many events can be created by one client (User)
     @ManyToOne
     @JoinColumn(name = "client_id")
     private User client;
+
     @Column(name = "pricing_type")
-    //@NotNull(message = "Pricing type is required")
     private String pricingType;
+
     @Column(name = "base_price")
-    //@NotNull(message = "Base price is required")
     private Double basePrice;
 
     LocalDateTime eventDate;
 
-    @Enumerated(EnumType.STRING)
-    private EventStatus status;
+    public enum EventStatus {
+        PENDING,
+        IN_PROGRESS,
+        COMPLETED
+    }
 
     // Getters and Setters
 
@@ -73,21 +66,27 @@ public class Event {
     public void setLocation(String location) {
         this.location = location;
     }
+
     public User getClient() {
         return client;
     }
+
     public void setClient(User client) {
         this.client = client;
     }
+
     public String getPricingType() {
         return pricingType;
     }
+
     public void setPricingType(String pricingType) {
         this.pricingType = pricingType;
     }
+
     public Double getBasePrice() {
         return basePrice;
     }
+
     public void setBasePrice(Double basePrice) {
         this.basePrice = basePrice;
     }
@@ -108,5 +107,11 @@ public class Event {
         this.status = status;
     }
 
-    
+    public Vendor getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
+    }
 }

@@ -70,4 +70,12 @@ public class EventService {
             throw new IllegalArgumentException("Event not found with ID: " + eventId);
         }
     }
+
+    public List<Event> getCurrentAssignedEvents(Long vendorId) {
+        return eventRepository.findByVendorIdAndStatus(vendorId, Event.EventStatus.IN_PROGRESS);
+    }
+
+    public List<Event> getCompletedEvents(Long vendorId) {
+        return eventRepository.findByVendorIdAndStatus(vendorId, Event.EventStatus.COMPLETED);
+    }
 }

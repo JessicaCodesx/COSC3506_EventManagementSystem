@@ -14,50 +14,64 @@ import java.util.List;
 public class InvoiceController {
 
     @Autowired
-    private InvoiceService service;
+    private InvoiceService invoiceService;
 
     @PostMapping
     public ResponseEntity<Invoice> create(@RequestBody Invoice invoice) {
-        return ResponseEntity.ok(service.create(invoice));
+        return ResponseEntity.ok(invoiceService.create(invoice));
     }
 
     @GetMapping
     public List<Invoice> getAll() {
-        return service.getAll();
+        return invoiceService.getAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Invoice> getById(@PathVariable Long id) {
-        return service.getById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return invoiceService.getById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/client/{clientId}")
-    public List<Invoice> getByClient(@PathVariable Long clientId) {
-        return service.getByClientId(clientId);
+    public ResponseEntity<List<Invoice>> getInvoicesByClient(@PathVariable Long clientId) {
+        List<Invoice> invoices = invoiceService.getInvoicesByClientId(clientId);
+        if (invoices.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(invoices);
+    }
+
+    @GetMapping("/client/{clientId}/status/{status}")
+    public ResponseEntity<List<Invoice>> getInvoicesByClientAndStatus(
+            @PathVariable Long clientId,
+            @PathVariable Invoice.InvoiceStatus status) {
+        List<Invoice> invoices = invoiceService.getInvoicesByClientIdAndStatus(clientId, status);
+        if (invoices.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(invoices);
     }
 
     @GetMapping("/event/{eventId}")
-public ResponseEntity<?> getByEvent(@PathVariable Long eventId) {
-    try {
-        List<Invoice> invoices = service.getByEventId(eventId);
-        return ResponseEntity.ok(invoices);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(500).body("Failed to fetch invoices for event: " + eventId);
+    public ResponseEntity<?> getByEvent(@PathVariable Long eventId) {
+        try {
+            List<Invoice> invoices = invoiceService.getByEventId(eventId);
+            return ResponseEntity.ok(invoices);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Failed to fetch invoices for event: " + eventId);
+        }
     }
-}
-
 
     @PutMapping("/{id}")
     public ResponseEntity<Invoice> updateInvoice(@PathVariable Long id, @RequestBody Invoice invoice) {
-        Invoice updated = service.update(id, invoice);
+        Invoice updated = invoiceService.update(id, invoice);
         if (updated != null) return ResponseEntity.ok(updated);
         return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        service.delete(id);
+        invoiceService.delete(id);
         return ResponseEntity.ok().build();
     }
 }

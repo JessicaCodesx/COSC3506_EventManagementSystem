@@ -27,6 +27,14 @@ public class InvoiceService {
         return repository.findByClientId(clientId);
     }
 
+    public List<Invoice> getInvoicesByClientId(Long clientId) {
+        return repository.findByClientId(clientId);
+    }
+
+    public List<Invoice> getInvoicesByClientIdAndStatus(Long clientId, Invoice.InvoiceStatus status) {
+        return repository.findByClientIdAndStatus(clientId, status);
+    }
+
     public List<Invoice> getByEventId(Long eventId) {
         return repository.findByEventId(eventId);
     }

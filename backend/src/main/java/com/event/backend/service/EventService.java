@@ -44,18 +44,19 @@ public class EventService {
     public void deleteEvent(Long id) {
         eventRepository.deleteById(id);
     }
+
     public Double calculateEventPrice(Long eventId, int quantity) {
         Optional<Event> eventOptional = eventRepository.findById(eventId);
-    
+
         if (eventOptional.isPresent()) {
             Event event = eventOptional.get();
             String pricingType = event.getPricingType();
             Double basePrice = event.getBasePrice();
-    
+
             if (pricingType == null || basePrice == null) {
                 throw new IllegalArgumentException("Pricing details are missing for this event.");
             }
-    
+
             switch (pricingType) {
                 case "per_seat":
                 case "per_attendee":

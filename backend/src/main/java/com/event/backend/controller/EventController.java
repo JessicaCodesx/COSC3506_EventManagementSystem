@@ -44,8 +44,12 @@ public class EventController {
     }
 
     @GetMapping("/client/{clientId}")
-    public List<Event> getEventsByClient(@PathVariable Long clientId) {
-        return eventService.getEventsByClientId(clientId);
+    public ResponseEntity<List<Event>> getEventsByClient(@PathVariable Long clientId) {
+        List<Event> events = eventService.getEventsByClientId(clientId);
+        if (events.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(events);
     }
 
     @PutMapping("/{id}")
@@ -60,17 +64,16 @@ public class EventController {
     public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
         return ResponseEntity.ok().build();
-    
     }
 
-private class EventPriceCalculator {
-    // EventPriceCalculator implementation
-    @Autowired
-    private EventService eventService;
+    private class EventPriceCalculator {
+        // EventPriceCalculator implementation
+        @Autowired
+        private EventService eventService;
 
-    @GetMapping("/{eventId}/price")
-    public Double calculateEventPrice(@PathVariable Long eventId, @RequestParam int quantity) {
-        return eventService.calculateEventPrice(eventId, quantity);
+        @GetMapping("/{eventId}/price")
+        public Double calculateEventPrice(@PathVariable Long eventId, @RequestParam int quantity) {
+            return eventService.calculateEventPrice(eventId, quantity);
+        }
     }
-}
 }

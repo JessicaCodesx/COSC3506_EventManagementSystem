@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { MOCK_INVOICES, MockUserService, MockEventService } from './mockApiService';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -45,16 +46,37 @@ export const AuthService = {
 
 export const UserService = {
   getCurrentUser: async () => {
+    // for testing - return dummy data
+    return {
+      "id": 25,
+      "firstName": "Test",
+      "lastName": "Client",
+      "email": "admin@example.com",
+      "password": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc0MzQ3NTQzNCwiZXhwIjoxNzQzNTYxODM0fQ.RGPa1narn9fovVaedkF5oYNHRHYQVQgJXr6PHlJKm5U",
+      "role": "ADMIN"
+  };
     const response = await api.get('/users/current');
+    return response.data;
+  },
+
+  createUser: async (userData: any) => {
+    // note - update when endpoint works
+    return MockUserService.createUser(userData);
+
+    const response = await api.post('/users', userData);
     return response.data;
   },
   
   updateProfile: async (userData: any) => {
+    return MockUserService.updateProfile(userData);
+    
     const response = await api.put('/users/profile', userData);
     return response.data;
   },
   
   getAllUsers: async () => {
+    return MockUserService.getAllUsers();
+
     const response = await api.get('/users');
     return response.data;
   },
@@ -72,11 +94,14 @@ export const EventService = {
   },
   
   getAllEvents: async () => {
-    const response = await api.get('/events');
-    return response.data;
+    return MockEventService.getAllEvents();
+    // const response = await api.get('/events');
+    // return response.data;
   },
   
   getEventById: async (id: number) => {
+    return MockEventService.getEventById(id);
+
     const response = await api.get(`/events/${id}`);
     return response.data;
   },
@@ -131,6 +156,7 @@ export const InvoiceService = {
   },
   
   getAllInvoices: async () => {
+    return MOCK_INVOICES;
     const response = await api.get('/invoices');
     return response.data;
   },

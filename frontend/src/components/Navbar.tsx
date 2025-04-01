@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import '../styles/Navbar.css';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import "../styles/Navbar.css";
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,8 +9,9 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    alert("Successfully logged out");
     logout();
-    navigate('/login');
+    navigate("/");
   };
 
   const toggleMenu = () => {
@@ -20,35 +21,51 @@ const Navbar: React.FC = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-logo">
+        <Link to={isAuthenticated ? "/Dashboard" : "/"} className="navbar-logo">
           <span>EMS</span>
         </Link>
 
         <div className="menu-icon" onClick={toggleMenu}>
-          <i className={isMenuOpen ? 'fa fa-times' : 'fa fa-bars'} />
+          <i className={isMenuOpen ? "fa fa-times" : "fa fa-bars"} />
         </div>
 
-        <ul className={isMenuOpen ? 'nav-menu active' : 'nav-menu'}>
+        <ul className={isMenuOpen ? "nav-menu active" : "nav-menu"}>
           <li className="nav-item">
-            <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+            <Link
+              to="/"
+              className="nav-link"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Home
             </Link>
           </li>
-          
+
           <li className="nav-item">
-            <Link to="/features" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+            <Link
+              to="/features"
+              className="nav-link"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Features
             </Link>
           </li>
-          
+
           <li className="nav-item">
-            <Link to="/pricing" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+            <Link
+              to="/pricing"
+              className="nav-link"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Pricing
             </Link>
           </li>
-          
+
           <li className="nav-item">
-            <Link to="/contact" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+            <Link
+              to="/contact"
+              className="nav-link"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Contact
             </Link>
           </li>
@@ -56,7 +73,11 @@ const Navbar: React.FC = () => {
           {isAuthenticated ? (
             <>
               <li className="nav-item">
-                <Link to="/dashboard" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+                <Link
+                  to="/dashboard"
+                  className="nav-link"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Dashboard
                 </Link>
               </li>
@@ -69,12 +90,20 @@ const Navbar: React.FC = () => {
           ) : (
             <>
               <li className="nav-item">
-                <Link to="/login" className="nav-link btn-login" onClick={() => setIsMenuOpen(false)}>
+                <Link
+                  to="/login"
+                  className="nav-link btn-login"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Login
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/register" className="nav-link btn-signup" onClick={() => setIsMenuOpen(false)}>
+                <Link
+                  to="/register"
+                  className="nav-link btn-signup"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Sign Up
                 </Link>
               </li>

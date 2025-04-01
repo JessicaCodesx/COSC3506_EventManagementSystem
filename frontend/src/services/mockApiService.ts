@@ -33,7 +33,7 @@ const MOCK_USERS = [
   }
 ];
 
-const MOCK_EVENTS = [
+export const MOCK_EVENTS = [
   {
     id: 1,
     eventName: 'Annual Corporate Retreat',
@@ -81,7 +81,7 @@ const MOCK_EVENTS = [
   }
 ];
 
-const MOCK_INVOICES = [
+export const MOCK_INVOICES = [
   {
     id: 101,
     event: { 
@@ -192,6 +192,19 @@ export const MockUserService = {
       email: user.email,
       role: user.role
     };
+  },
+
+  createUser: async (userData: any) => {
+    await delay(300);
+    
+    const newUser = {
+      id: MOCK_USERS.length + 1,
+      ...userData
+    };
+    
+    MOCK_USERS.push(newUser);
+    
+    return newUser;
   },
   
   updateProfile: async (userData: any) => {

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { EventService, AssignmentService } from '../services/apiService';
-import { useAuth } from '../contexts/AuthContext';
-import Sidebar from '../components/Sidebar';
-import DashboardHeader from '../components/DashboardHeader';
-import '../styles/DetailPages.css';
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { EventService, AssignmentService } from "../services/apiService";
+import { useAuth } from "../contexts/AuthContext";
+import Sidebar from "../components/Sidebar";
+import DashboardHeader from "../components/DashboardHeader";
+import "../styles/DetailPages.css";
 
 interface Event {
   id: number;
@@ -45,7 +45,7 @@ const EventDetailsPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const { user, role } = useAuth();
   const navigate = useNavigate();
-  
+
   const [event, setEvent] = useState<Event | null>(null);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,68 +55,70 @@ const EventDetailsPage: React.FC = () => {
   useEffect(() => {
     const fetchEventData = async () => {
       if (!eventId) return;
-      
+
       setLoading(true);
       try {
         const eventData = await EventService.getEventById(parseInt(eventId));
         setEvent(eventData);
-        
-        const assignmentData = await AssignmentService.getAssignmentsByEvent(parseInt(eventId));
+
+        const assignmentData = await AssignmentService.getAssignmentsByEvent(
+          parseInt(eventId)
+        );
         setAssignments(assignmentData);
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch event details');
+        setError(err.message || "Failed to fetch event details");
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchEventData();
   }, [eventId]);
 
   const handleDeleteEvent = async () => {
     if (!eventId) return;
-    
+
     try {
       await EventService.deleteEvent(parseInt(eventId));
-      navigate('/events');
+      navigate("/events");
     } catch (err: any) {
-      setError(err.message || 'Failed to delete event');
+      setError(err.message || "Failed to delete event");
     }
   };
 
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'SCHEDULED':
-        return 'status-scheduled';
-      case 'COMPLETED':
-        return 'status-completed';
-      case 'CANCELED':
-        return 'status-canceled';
+      case "SCHEDULED":
+        return "status-scheduled";
+      case "COMPLETED":
+        return "status-completed";
+      case "CANCELED":
+        return "status-canceled";
       default:
-        return '';
+        return "";
     }
   };
 
   const canEdit = () => {
-    if (role === 'ADMIN') return true;
-    if (role === 'CLIENT' && event?.client?.id === user?.id) return true;
+    if (role === "ADMIN") return true;
+    if (role === "CLIENT" && event?.client?.id === user?.id) return true;
     return false;
   };
 
   const canDelete = () => {
-    if (role === 'ADMIN') return true;
-    if (role === 'CLIENT' && event?.client?.id === user?.id) return true;
+    if (role === "ADMIN") return true;
+    if (role === "CLIENT" && event?.client?.id === user?.id) return true;
     return false;
   };
 
@@ -141,18 +143,23 @@ const EventDetailsPage: React.FC = () => {
                 <div className="detail-header">
                   <div className="detail-title">
                     <h1>{event.eventName}</h1>
-                    <span className={`status-badge ${getStatusClass(event.status)}`}>
+                    <span
+                      className={`status-badge ${getStatusClass(event.status)}`}
+                    >
                       {event.status}
                     </span>
                   </div>
                   <div className="detail-actions">
                     {canEdit() && (
-                      <Link to={`/events/${eventId}/edit`} className="btn btn-secondary">
+                      <Link
+                        to={`/events/${eventId}/edit`}
+                        className="btn btn-secondary"
+                      >
                         <i className="fa fa-edit"></i> Edit
                       </Link>
                     )}
                     {canDelete() && (
-                      <button 
+                      <button
                         className="btn btn-danger"
                         onClick={() => setDeleteModalOpen(true)}
                       >
@@ -168,17 +175,20 @@ const EventDetailsPage: React.FC = () => {
                     <div className="detail-grid">
                       <div className="detail-item">
                         <span className="detail-label">Date & Time</span>
-                        <span className="detail-value">{formatDate(event.eventDate)}</span>
+                        <span className="detail-value">
+                          {formatDate(event.eventDate)}
+                        </span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Location</span>
                         <span className="detail-value">{event.location}</span>
                       </div>
-                      {role === 'ADMIN' && event.client && (
+                      {role === "ADMIN" && event.client && (
                         <div className="detail-item">
                           <span className="detail-label">Client</span>
                           <span className="detail-value">
-                            {event.client.firstName} {event.client.lastName} ({event.client.email})
+                            {event.client.firstName} {event.client.lastName} (
+                            {event.client.email})
                           </span>
                         </div>
                       )}
@@ -195,12 +205,15 @@ const EventDetailsPage: React.FC = () => {
                     <div className="section-header">
                       <h2>Assigned Staff & Vendors</h2>
                       {canEdit() && (
-                        <Link to={`/events/${eventId}/assign`} className="btn-link">
+                        <Link
+                          to={`/events/${eventId}/assign`}
+                          className="btn-link"
+                        >
                           <i className="fa fa-plus"></i> Add Assignment
                         </Link>
                       )}
                     </div>
-                    
+
                     {assignments.length > 0 ? (
                       <div className="detail-table-container">
                         <table className="detail-table">
@@ -214,27 +227,29 @@ const EventDetailsPage: React.FC = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {assignments.map(assignment => (
+                            {assignments.map((assignment) => (
                               <tr key={assignment.id}>
                                 <td>{assignment.role}</td>
-                                <td>{assignment.vendor ? 'Vendor' : 'Staff'}</td>
                                 <td>
-                                  {assignment.vendor ? 
-                                    `${assignment.vendor.firstName} ${assignment.vendor.lastName}` : 
-                                    assignment.staff ? 
-                                      `${assignment.staff.firstName} ${assignment.staff.lastName}` : 
-                                      'N/A'}
+                                  {assignment.vendor ? "Vendor" : "Staff"}
                                 </td>
                                 <td>
-                                  {assignment.vendor ? 
-                                    assignment.vendor.email : 
-                                    assignment.staff ? 
-                                      assignment.staff.email : 
-                                      'N/A'}
+                                  {assignment.vendor
+                                    ? `${assignment.vendor.firstName} ${assignment.vendor.lastName}`
+                                    : assignment.staff
+                                    ? `${assignment.staff.firstName} ${assignment.staff.lastName}`
+                                    : "N/A"}
+                                </td>
+                                <td>
+                                  {assignment.vendor
+                                    ? assignment.vendor.email
+                                    : assignment.staff
+                                    ? assignment.staff.email
+                                    : "N/A"}
                                 </td>
                                 {canEdit() && (
                                   <td className="actions-cell">
-                                    <button 
+                                    <button
                                       className="action-button"
                                       title="Remove Assignment"
                                     >
@@ -251,7 +266,10 @@ const EventDetailsPage: React.FC = () => {
                       <div className="detail-empty-state">
                         <p>No staff or vendors assigned to this event yet.</p>
                         {canEdit() && (
-                          <Link to={`/events/${eventId}/assign`} className="btn-primary">
+                          <Link
+                            to={`/events/${eventId}/assign`}
+                            className="btn-primary"
+                          >
                             <i className="fa fa-plus"></i> Assign Staff/Vendor
                           </Link>
                         )}
@@ -273,17 +291,22 @@ const EventDetailsPage: React.FC = () => {
                         <h2>Confirm Deletion</h2>
                       </div>
                       <div className="modal-body">
-                        <p>Are you sure you want to delete the event "{event.eventName}"?</p>
-                        <p className="modal-warning">This action cannot be undone.</p>
+                        <p>
+                          Are you sure you want to delete the event "
+                          {event.eventName}"?
+                        </p>
+                        <p className="modal-warning">
+                          This action cannot be undone.
+                        </p>
                       </div>
                       <div className="modal-footer">
-                        <button 
+                        <button
                           className="btn btn-secondary"
                           onClick={() => setDeleteModalOpen(false)}
                         >
                           Cancel
                         </button>
-                        <button 
+                        <button
                           className="btn btn-danger"
                           onClick={handleDeleteEvent}
                         >

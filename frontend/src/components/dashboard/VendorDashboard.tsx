@@ -1,55 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import '../../styles/DashboardModules.css';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import "../../styles/DashboardModules.css";
 
 // Mock data - in a real app, this would come from API
 const mockAssignments = [
-  { 
-    id: 1, 
-    eventName: 'Annual Corporate Retreat', 
-    clientName: 'Acme Corp',
-    location: 'Mountain View Resort', 
-    eventDate: '2025-06-15T14:00:00', 
-    role: 'Catering',
-    status: 'SCHEDULED' 
+  {
+    id: 1,
+    eventName: "Annual Corporate Retreat",
+    clientName: "Acme Corp",
+    location: "Mountain View Resort",
+    eventDate: "2025-06-15T14:00:00",
+    role: "Catering",
+    status: "SCHEDULED",
   },
-  { 
-    id: 2, 
-    eventName: 'Product Launch', 
-    clientName: 'Tech Innovations Inc',
-    location: 'Downtown Convention Center', 
-    eventDate: '2025-05-10T09:00:00', 
-    role: 'AV Equipment',
-    status: 'SCHEDULED' 
+  {
+    id: 2,
+    eventName: "Product Launch",
+    clientName: "Tech Innovations Inc",
+    location: "Downtown Convention Center",
+    eventDate: "2025-05-10T09:00:00",
+    role: "AV Equipment",
+    status: "SCHEDULED",
   },
-  { 
-    id: 3, 
-    eventName: 'Charity Gala', 
-    clientName: 'Global Foundation',
-    location: 'Grand Ballroom', 
-    eventDate: '2025-04-30T18:00:00', 
-    role: 'Decorations',
-    status: 'SCHEDULED' 
-  }
+  {
+    id: 3,
+    eventName: "Charity Gala",
+    clientName: "Global Foundation",
+    location: "Grand Ballroom",
+    eventDate: "2025-04-30T18:00:00",
+    role: "Decorations",
+    status: "SCHEDULED",
+  },
 ];
 
 const mockPayments = [
-  { 
-    id: 101, 
+  {
+    id: 101,
     eventId: 1,
-    eventName: 'Annual Corporate Retreat',
-    amountPaid: 2500.00, 
-    paymentDate: '2025-04-15',
-    paymentMethod: 'Bank Transfer'
+    eventName: "Annual Corporate Retreat",
+    amountPaid: 2500.0,
+    paymentDate: "2025-04-15",
+    paymentMethod: "Bank Transfer",
   },
-  { 
-    id: 102, 
+  {
+    id: 102,
     eventId: 2,
-    eventName: 'Product Launch',
-    amountPaid: 1750.00, 
-    paymentDate: '2025-03-25',
-    paymentMethod: 'Credit Card'
-  }
+    eventName: "Product Launch",
+    amountPaid: 1750.0,
+    paymentDate: "2025-03-25",
+    paymentMethod: "Credit Card",
+  },
 ];
 
 const VendorDashboard: React.FC = () => {
@@ -65,13 +65,11 @@ const VendorDashboard: React.FC = () => {
       try {
         // const token = localStorage.getItem('token');
         // const vendorId = '1'; // Would come from auth context or state
-        
         // const assignmentsResponse = await fetch(`http://localhost:8080/api/assignments/vendor/${vendorId}`, {
         //   headers: { Authorization: `Bearer ${token}` }
         // });
         // const assignmentsData = await assignmentsResponse.json();
         // setAssignments(assignmentsData);
-        
         // // Fetch payments related to vendor
         // // This would be a different endpoint in a real API
         // const paymentsResponse = await fetch(`http://localhost:8080/api/payments/vendor/${vendorId}`, {
@@ -80,23 +78,23 @@ const VendorDashboard: React.FC = () => {
         // const paymentsData = await paymentsResponse.json();
         // setPayments(paymentsData);
       } catch (error) {
-        console.error('Error fetching vendor data:', error);
+        console.error("Error fetching vendor data:", error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     // Comment out for now since we're using mock data
     // fetchData();
   }, []);
 
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
@@ -107,19 +105,19 @@ const VendorDashboard: React.FC = () => {
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'SCHEDULED':
-        return 'status-scheduled';
-      case 'COMPLETED':
-        return 'status-completed';
-      case 'CANCELED':
-        return 'status-canceled';
+      case "SCHEDULED":
+        return "status-scheduled";
+      case "COMPLETED":
+        return "status-completed";
+      case "CANCELED":
+        return "status-canceled";
       default:
-        return '';
+        return "";
     }
   };
 
   // Calculate upcoming assignments (next 7 days)
-  const upcomingAssignments = assignments.filter(assignment => {
+  const upcomingAssignments = assignments.filter((assignment) => {
     const eventDate = new Date(assignment.eventDate);
     const today = new Date();
     const nextWeek = new Date();
@@ -128,13 +126,19 @@ const VendorDashboard: React.FC = () => {
   });
 
   // Calculate total earnings
-  const totalEarnings = payments.reduce((sum, payment) => sum + payment.amountPaid, 0);
+  const totalEarnings = payments.reduce(
+    (sum, payment) => sum + payment.amountPaid,
+    0
+  );
 
   return (
     <div className="dashboard-container">
       <div className="dashboard-welcome">
         <h1>Vendor Dashboard</h1>
-        <p>Manage your service assignments, track payments, and update your profile.</p>
+        <p>
+          Manage your service assignments, track payments, and update your
+          profile.
+        </p>
       </div>
 
       <div className="dashboard-summary">
@@ -177,7 +181,7 @@ const VendorDashboard: React.FC = () => {
               View All <i className="fa fa-arrow-right"></i>
             </Link>
           </div>
-          
+
           <div className="widget-content">
             {loading ? (
               <div className="loading-spinner">Loading...</div>
@@ -194,19 +198,26 @@ const VendorDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {assignments.map(assignment => (
+                  {assignments.map((assignment) => (
                     <tr key={assignment.id}>
                       <td>{assignment.eventName}</td>
                       <td>{assignment.clientName}</td>
                       <td>{formatDate(assignment.eventDate)}</td>
                       <td>{assignment.role}</td>
                       <td>
-                        <span className={`status-badge ${getStatusClass(assignment.status)}`}>
+                        <span
+                          className={`status-badge ${getStatusClass(
+                            assignment.status
+                          )}`}
+                        >
                           {assignment.status}
                         </span>
                       </td>
                       <td>
-                        <Link to={`/assignments/${assignment.id}`} className="action-button">
+                        <Link
+                          to={`/assignments/${assignment.id}`}
+                          className="action-button"
+                        >
                           <i className="fa fa-eye"></i>
                         </Link>
                       </td>
@@ -230,7 +241,7 @@ const VendorDashboard: React.FC = () => {
               View All <i className="fa fa-arrow-right"></i>
             </Link>
           </div>
-          
+
           <div className="widget-content">
             {loading ? (
               <div className="loading-spinner">Loading...</div>
@@ -245,7 +256,7 @@ const VendorDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {payments.map(payment => (
+                  {payments.map((payment) => (
                     <tr key={payment.id}>
                       <td>{payment.eventName}</td>
                       <td>${payment.amountPaid.toFixed(2)}</td>
@@ -275,7 +286,7 @@ const VendorDashboard: React.FC = () => {
             <p>Update your service offerings and pricing</p>
           </div>
         </Link>
-        
+
         <Link to="/availability" className="action-card">
           <div className="action-icon">
             <i className="fa fa-calendar-alt"></i>
@@ -285,7 +296,7 @@ const VendorDashboard: React.FC = () => {
             <p>Update your calendar and availability</p>
           </div>
         </Link>
-        
+
         <Link to="/profile" className="action-card">
           <div className="action-icon">
             <i className="fa fa-id-card"></i>

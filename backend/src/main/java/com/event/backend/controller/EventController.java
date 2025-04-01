@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.event.backend.model.Event;
 import com.event.backend.service.EventService;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/events")
@@ -59,5 +60,17 @@ public class EventController {
     public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
         return ResponseEntity.ok().build();
+    
     }
+
+private class EventPriceCalculator {
+    // EventPriceCalculator implementation
+    @Autowired
+    private EventService eventService;
+
+    @GetMapping("/{eventId}/price")
+    public Double calculateEventPrice(@PathVariable Long eventId, @RequestParam int quantity) {
+        return eventService.calculateEventPrice(eventId, quantity);
+    }
+}
 }

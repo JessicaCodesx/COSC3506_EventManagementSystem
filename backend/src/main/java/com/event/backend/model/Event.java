@@ -3,7 +3,7 @@ package com.event.backend.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import com.event.backend.model.Vendor; // Import Vendor class
+
 
 @Entity
 @Table(name = "events")
@@ -107,11 +107,6 @@ public class Event {
         this.status = status;
     }
 
-    public Vendor getVendor() {
-        return vendor;
-    }
-
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
-    }
+    
 }
+

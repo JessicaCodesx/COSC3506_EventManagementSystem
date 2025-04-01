@@ -37,16 +37,9 @@ public class InvoiceController {
     }
 
     @GetMapping("/event/{eventId}")
-public ResponseEntity<?> getByEvent(@PathVariable Long eventId) {
-    try {
-        List<Invoice> invoices = service.getByEventId(eventId);
-        return ResponseEntity.ok(invoices);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(500).body("Failed to fetch invoices for event: " + eventId);
+    public List<Invoice> getByEvent(@PathVariable Long eventId) {
+        return service.getByEventId(eventId);
     }
-}
-
 
     @PutMapping("/{id}")
     public ResponseEntity<Invoice> updateInvoice(@PathVariable Long id, @RequestBody Invoice invoice) {

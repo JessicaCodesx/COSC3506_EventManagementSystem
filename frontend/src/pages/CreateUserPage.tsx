@@ -164,7 +164,7 @@ const CreateUserPage: React.FC = () => {
                 <button
                   type="button"
                   className="btn-secondary"
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate(-1)}
                   disabled={loading}
                 >
                   Cancel

@@ -50,7 +50,8 @@ public class EventController {
     @PutMapping("/{id}")
     public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event event) {
         Event updated = eventService.updateEvent(id, event);
-        if (updated != null) return ResponseEntity.ok(updated);
+        if (updated != null)
+            return ResponseEntity.ok(updated);
         return ResponseEntity.notFound().build();
     }
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MockAuthService, MockInvoiceService, MockUserService, MockEventService, MockAssignmentService, MockPaymentService } from './mockApiService';
+import { MockAuthService, MockInvoiceService, MockUserService, MockEventService, MockAssignmentService, MockPaymentService, MockVendorAvailabilityService } from './mockApiService';
 
 const useMockServices = true;
 
@@ -45,6 +45,13 @@ export interface User {
   lastName: string;
   role: string;
 };
+
+export interface Availibility {
+  id: number;
+  vendorID: number;
+  start: string;
+  end: string
+}
 
 export interface Invoice {
   id: number;
@@ -162,6 +169,20 @@ export const UserService = {
     return response.data;
   }
 };
+
+export const VendorAvailabilityService = {
+  getAll: async(userID: number) => {
+    return MockVendorAvailabilityService.getAll(userID);
+  },
+
+  add: async(userID: number, start: string, end: string) => {
+    return MockVendorAvailabilityService.add(userID, start, end);
+  },
+
+  remove: async(id: number) => {
+    return MockVendorAvailabilityService.remove(id);
+  }
+}
 
 export const EventService = {
   createEvent: async (eventData: any) => {

@@ -21,7 +21,11 @@ const MOCK_USERS = [
     lastName: 'User',
     email: 'vendor@example.com',
     password: 'Vendor123',
-    role: 'VENDOR'
+    role: 'VENDOR',
+    availability: [{
+      start: '2025-01-01',
+      end: '2025-01-31'
+    }]
   },
   {
     id: 4,
@@ -249,6 +253,27 @@ const MOCK_ASSIGNMENTS = [
   }
 ]
 
+const MOCK_VENDORAVAILABILITY = [
+  {
+    id: 1,
+    vendorID: 3,
+    start: '2025-01-01',
+    end: '2025-01-31'
+  },
+  {
+    id: 2,
+    vendorID: 3,
+    start: '2025-03-01',
+    end: '2025-03-31'
+  },
+  {
+    id: 3,
+    vendorID: 4,
+    start: '2025-03-01',
+    end: '2025-03-31'
+  }
+]
+
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const MockAuthService = {
@@ -310,7 +335,8 @@ export const MockUserService = {
       firstName: MOCK_USERS[index].firstName,
       lastName: MOCK_USERS[index].lastName,
       email: MOCK_USERS[index].email,
-      role: MOCK_USERS[index].role
+      role: MOCK_USERS[index].role,
+      availability: MOCK_USERS[index].availability
     };
   },
 
@@ -373,7 +399,46 @@ export const MockUserService = {
       role: user.role
     };
   }
+
+  
 };
+
+export const MockVendorAvailabilityService = {
+  getAll: async(userID: number) => {
+    await delay(100);
+
+    return MOCK_VENDORAVAILABILITY.filter(x => x.vendorID === userID);
+  },
+
+  add: async(userID: number, start: string, end: string) => {
+    await delay(100);
+
+    const newAvailability = {
+      id: MOCK_VENDORAVAILABILITY.length + 1,
+      vendorID: userID,
+      start: start,
+      end: end
+    };
+    
+    MOCK_VENDORAVAILABILITY.push(newAvailability);
+    return newAvailability;
+  },
+
+  remove: async(id: number) => {
+    await delay(150);
+    
+    const index = MOCK_VENDORAVAILABILITY.findIndex(e => e.id === id);
+    
+    if (index === -1) {
+      throw new Error('Invoice not found');
+    }
+    
+    MOCK_VENDORAVAILABILITY.splice(index, 1);
+    
+    return { success: true };
+  }
+}
+
 
 export const MockEventService = {
   createEvent: async (eventData: any) => {

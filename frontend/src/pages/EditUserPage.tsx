@@ -100,8 +100,6 @@ const EditUserPage: React.FC = () => {
         role: formData.role,
       };
 
-      console.log(userData);
-
       // Call API to create invoice
       const newUser = await UserService.updateProfile(userData);
       setSuccess("User updated successfully!");

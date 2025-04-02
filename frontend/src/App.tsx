@@ -35,6 +35,7 @@ import PaymentPage from "./pages/PaymentPage";
 import ReportPage from "./pages/ReportPage";
 import CreateUserPage from "./pages/CreateUserPage";
 import UserManagementPage from "./pages/UserManagementPage";
+import EditUserPage from "./pages/EditUserPage";
 
 // Vendor pages
 import VendorAvailabilityPage from "./pages/VendorAvailabilityPage";
@@ -170,6 +171,15 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={["ADMIN"]}>
                   <UserManagementPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/users/:userID/edit"
+              element={
+                <ProtectedRoute allowedRoles={["ADMIN"]}>
+                  <EditUserPage />
                 </ProtectedRoute>
               }
             />

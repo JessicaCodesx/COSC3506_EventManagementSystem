@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { EventService } from '../services/apiService';
-import { useAuth } from '../contexts/AuthContext';
-import Sidebar from '../components/Sidebar';
-import DashboardHeader from '../components/DashboardHeader';
-import '../styles/ListPages.css';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { EventService } from "../services/apiService";
+import { useAuth } from "../contexts/AuthContext";
+import Sidebar from "../components/Sidebar";
+import DashboardHeader from "../components/DashboardHeader";
+import "../styles/ListPages.css";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface Event {
   id: number;
@@ -24,8 +26,8 @@ const EventsListPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -34,9 +36,9 @@ const EventsListPage: React.FC = () => {
         let eventData;
 
         // Different API calls based on user role
-        if (role === 'ADMIN') {
+        if (role === "ADMIN") {
           eventData = await EventService.getAllEvents();
-        } else if (role === 'CLIENT' && user?.id) {
+        } else if (role === "CLIENT" && user?.id) {
           eventData = await EventService.getEventsByClientId(user.id);
         } else {
           // For vendors and staff, they would see assigned events
@@ -46,7 +48,7 @@ const EventsListPage: React.FC = () => {
 
         setEvents(eventData);
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch events');
+        setError(err.message || "Failed to fetch events");
       } finally {
         setLoading(false);
       }
@@ -56,37 +58,38 @@ const EventsListPage: React.FC = () => {
   }, [role, user?.id]);
 
   // Filter events based on search term and status
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = 
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch =
       event.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.location.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
-    
+
+    const matchesStatus =
+      statusFilter === "ALL" || event.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'SCHEDULED':
-        return 'status-scheduled';
-      case 'COMPLETED':
-        return 'status-completed';
-      case 'CANCELED':
-        return 'status-canceled';
+      case "SCHEDULED":
+        return "status-scheduled";
+      case "COMPLETED":
+        return "status-completed";
+      case "CANCELED":
+        return "status-canceled";
       default:
-        return '';
+        return "";
     }
   };
 
@@ -119,8 +122,8 @@ const EventsListPage: React.FC = () => {
               </div>
 
               <div className="filter-options">
-                <select 
-                  value={statusFilter} 
+                <select
+                  value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
                   <option value="ALL">All Statuses</option>
@@ -141,7 +144,7 @@ const EventsListPage: React.FC = () => {
                   <thead>
                     <tr>
                       <th>Event Name</th>
-                      {role === 'ADMIN' && <th>Client</th>}
+                      {role === "ADMIN" && <th>Client</th>}
                       <th>Date & Time</th>
                       <th>Location</th>
                       <th>Status</th>
@@ -149,35 +152,42 @@ const EventsListPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredEvents.map(event => (
+                    {filteredEvents.map((event) => (
                       <tr key={event.id}>
                         <td>{event.eventName}</td>
-                        {role === 'ADMIN' && (
+                        {role === "ADMIN" && (
                           <td>
-                            {event.client ? 
-                              `${event.client.firstName} ${event.client.lastName}` : 
-                              'N/A'}
+                            {event.client
+                              ? `${event.client.firstName} ${event.client.lastName}`
+                              : "N/A"}
                           </td>
                         )}
                         <td>{formatDate(event.eventDate)}</td>
                         <td>{event.location}</td>
                         <td>
-                          <span className={`status-badge ${getStatusClass(event.status)}`}>
+                          <span
+                            className={`status-badge ${getStatusClass(
+                              event.status
+                            )}`}
+                          >
                             {event.status}
                           </span>
                         </td>
                         <td className="actions-cell">
-                          <Link to={`/events/${event.id}`} className="action-button" title="View Details">
-                            <i className="fa fa-eye"></i>
+                          <Link
+                            to={`/events/${event.id}`}
+                            className="action-button"
+                            title="View Details"
+                          >
+                            <VisibilityIcon />
                           </Link>
-                          <Link to={`/events/${event.id}/edit`} className="action-button" title="Edit">
-                            <i className="fa fa-edit"></i>
+                          <Link
+                            to={`/events/${event.id}/edit`}
+                            className="action-button"
+                            title="Edit"
+                          >
+                            <EditIcon />
                           </Link>
-                          {role === 'ADMIN' || role === 'CLIENT' ? (
-                            <Link to={`/events/${event.id}/manage`} className="action-button" title="Manage">
-                              <i className="fa fa-cogs"></i>
-                            </Link>
-                          ) : null}
                         </td>
                       </tr>
                     ))}
@@ -189,11 +199,11 @@ const EventsListPage: React.FC = () => {
                 <i className="fa fa-calendar"></i>
                 <h3>No events found</h3>
                 <p>
-                  {searchTerm || statusFilter !== 'ALL' ? 
-                    'Try adjusting your search or filters' : 
-                    'Get started by creating your first event'}
+                  {searchTerm || statusFilter !== "ALL"
+                    ? "Try adjusting your search or filters"
+                    : "Get started by creating your first event"}
                 </p>
-                {!searchTerm && statusFilter === 'ALL' && (
+                {!searchTerm && statusFilter === "ALL" && (
                   <Link to="/events/create" className="btn-primary">
                     Create Event
                   </Link>

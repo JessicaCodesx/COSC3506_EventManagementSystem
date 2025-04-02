@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MockInvoiceService, MockUserService, MockEventService, MockAssignmentService } from './mockApiService';
+import { MockAuthService, MockInvoiceService, MockUserService, MockEventService, MockAssignmentService } from './mockApiService';
 
 const useMockServices = true;
 
@@ -74,16 +74,25 @@ export interface Assignment {
 
 export const AuthService = {
   login: async (email: string, password: string) => {
+    if(useMockServices)
+        return MockAuthService.login(email, password);
+
     const response = await api.post('/auth/login', { email, password });
     return response.data;
   },
   
   register: async (userData: any) => {
+    if(useMockServices)
+      return MockAuthService.register(userData);
+
     const response = await api.post('/users/register', userData);
     return response.data;
   },
   
   verifyToken: async () => {
+    if(useMockServices)
+      return MockAuthService.verifyToken();
+
     try {
       const response = await api.get('/auth/verify');
       return response.data;
@@ -135,6 +144,9 @@ export const UserService = {
   },
   
   getUserById: async (id: number) => {
+    if(useMockServices)
+      return MockUserService.getUserById(id);
+
     const response = await api.get(`/users/${id}`);
     return response.data;
   }

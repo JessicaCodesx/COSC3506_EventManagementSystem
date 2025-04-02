@@ -3,113 +3,62 @@ import { Link } from "react-router-dom";
 import "../../styles/DashboardModules.css";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import PersonIcon from "@mui/icons-material/Person";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
-
-const mockEvents = [
-  {
-    id: 1,
-    eventName: "Annual Corporate Retreat",
-    client: "Acme Corp",
-    location: "Mountain View Resort",
-    eventDate: "2025-06-15T14:00:00",
-    status: "SCHEDULED",
-  },
-  {
-    id: 2,
-    eventName: "Product Launch",
-    client: "Tech Innovations Inc",
-    location: "Downtown Convention Center",
-    eventDate: "2025-05-10T09:00:00",
-    status: "SCHEDULED",
-  },
-  {
-    id: 3,
-    eventName: "Charity Gala",
-    client: "Global Foundation",
-    location: "Grand Ballroom",
-    eventDate: "2025-04-30T18:00:00",
-    status: "SCHEDULED",
-  },
-  {
-    id: 4,
-    eventName: "Team Building Workshop",
-    client: "Startup XYZ",
-    location: "Adventure Park",
-    eventDate: "2025-04-22T10:00:00",
-    status: "COMPLETED",
-  },
-];
-
-const mockUsers = [
-  {
-    id: 1,
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@example.com",
-    role: "CLIENT",
-  },
-  {
-    id: 2,
-    firstName: "Jane",
-    lastName: "Smith",
-    email: "jane@example.com",
-    role: "VENDOR",
-  },
-  {
-    id: 3,
-    firstName: "Robert",
-    lastName: "Johnson",
-    email: "robert@example.com",
-    role: "STAFF",
-  },
-  {
-    id: 4,
-    firstName: "Emily",
-    lastName: "Williams",
-    email: "emily@example.com",
-    role: "CLIENT",
-  },
-  {
-    id: 5,
-    firstName: "Michael",
-    lastName: "Brown",
-    email: "michael@example.com",
-    role: "VENDOR",
-  },
-];
-
-const mockInvoices = [
-  {
-    id: 101,
-    eventId: 1,
-    client: "Acme Corp",
-    totalAmount: 5200.0,
-    status: "PENDING",
-    dueDate: "2025-05-15",
-  },
-  {
-    id: 102,
-    eventId: 2,
-    client: "Tech Innovations Inc",
-    totalAmount: 3750.0,
-    status: "PAID",
-    dueDate: "2025-04-10",
-  },
-  {
-    id: 103,
-    eventId: 3,
-    client: "Global Foundation",
-    totalAmount: 8900.0,
-    status: "PENDING",
-    dueDate: "2025-04-15",
-  },
-];
+import {
+  EventService,
+  UserService,
+  InvoiceService,
+  Event,
+  User,
+  Invoice,
+} from "../../services/apiService";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import { useAuth } from "../../contexts/AuthContext";
+import GroupIcon from "@mui/icons-material/Group";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import PriceChangeIcon from "@mui/icons-material/PriceChange";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
 
 const AdminDashboard: React.FC = () => {
-  const [events, setEvents] = useState(mockEvents);
-  const [users, setUsers] = useState(mockUsers);
-  const [invoices, setInvoices] = useState(mockInvoices);
+  const { user, role } = useAuth();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        let eventData;
+        eventData = await EventService.getAllEvents();
+        setEvents(eventData);
+      } catch (err: any) {}
+    };
+
+    fetchEvents();
+
+    const fetchUsers = async () => {
+      try {
+        let userData;
+        userData = await UserService.getAllUsers();
+        setUsers(userData);
+      } catch (err: any) {}
+    };
+
+    fetchUsers();
+
+    const fetchInvoice = async () => {
+      try {
+        let invoiceData;
+        invoiceData = await InvoiceService.getAllInvoices();
+        setInvoices(invoiceData);
+      } catch (err: any) {}
+    };
+
+    fetchInvoice();
+  }, [role, user?.id]);
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -166,7 +115,7 @@ const AdminDashboard: React.FC = () => {
       <div className="dashboard-summary">
         <div className="summary-card">
           <div className="summary-icon">
-            <i className="fa fa-calendar"></i>
+            <CalendarTodayIcon />
           </div>
           <div className="summary-details">
             <h3>{events.length}</h3>
@@ -176,7 +125,7 @@ const AdminDashboard: React.FC = () => {
 
         <div className="summary-card">
           <div className="summary-icon">
-            <i className="fa fa-users"></i>
+            <GroupIcon />
           </div>
           <div className="summary-details">
             <h3>{users.length}</h3>
@@ -186,7 +135,7 @@ const AdminDashboard: React.FC = () => {
 
         <div className="summary-card">
           <div className="summary-icon">
-            <i className="fa fa-dollar-sign"></i>
+            <PriceChangeIcon />
           </div>
           <div className="summary-details">
             <h3>
@@ -201,7 +150,7 @@ const AdminDashboard: React.FC = () => {
 
         <div className="summary-card">
           <div className="summary-icon">
-            <i className="fa fa-file-invoice-dollar"></i>
+            <AttachMoneyIcon />
           </div>
           <div className="summary-details">
             <h3>{invoices.filter((inv) => inv.status === "PENDING").length}</h3>
@@ -215,7 +164,7 @@ const AdminDashboard: React.FC = () => {
           <div className="widget-header">
             <h2>Upcoming Events</h2>
             <Link to="/events" className="view-all-link">
-              View All <i className="fa fa-arrow-right"></i>
+              View All
             </Link>
           </div>
 
@@ -238,7 +187,7 @@ const AdminDashboard: React.FC = () => {
                   {events.slice(0, 5).map((event) => (
                     <tr key={event.id}>
                       <td>{event.eventName}</td>
-                      <td>{event.client}</td>
+                      <td>{event.client ? event.client.firstName : ""}</td>
                       <td>{formatDate(event.eventDate)}</td>
                       <td>{event.location}</td>
                       <td>
@@ -255,13 +204,13 @@ const AdminDashboard: React.FC = () => {
                           to={`/events/${event.id}`}
                           className="action-button"
                         >
-                          <i className="fa fa-eye"></i>
+                          <VisibilityIcon />
                         </Link>
                         <Link
                           to={`/events/${event.id}/edit`}
                           className="action-button"
                         >
-                          <i className="fa fa-edit"></i>
+                          <EditIcon />
                         </Link>
                       </td>
                     </tr>
@@ -281,7 +230,7 @@ const AdminDashboard: React.FC = () => {
           <div className="widget-header">
             <h2>Recent Users</h2>
             <Link to="/users" className="view-all-link">
-              View All <i className="fa fa-arrow-right"></i>
+              View All
             </Link>
           </div>
 
@@ -317,13 +266,13 @@ const AdminDashboard: React.FC = () => {
                           to={`/users/${user.id}`}
                           className="action-button"
                         >
-                          <i className="fa fa-eye"></i>
+                          <VisibilityIcon />
                         </Link>
                         <Link
                           to={`/users/${user.id}/edit`}
                           className="action-button"
                         >
-                          <i className="fa fa-edit"></i>
+                          <EditIcon />
                         </Link>
                       </td>
                     </tr>
@@ -353,11 +302,21 @@ const AdminDashboard: React.FC = () => {
 
         <Link to="/users/create" className="action-card">
           <div className="action-icon">
-            <PersonIcon />
+            <PersonAddIcon />
           </div>
           <div className="action-details">
             <h3>Add New User</h3>
             <p>Create account for user</p>
+          </div>
+        </Link>
+
+        <Link to="/users" className="action-card">
+          <div className="action-icon">
+            <PersonIcon />
+          </div>
+          <div className="action-details">
+            <h3>Edit Existing User</h3>
+            <p>Change data from an existing account</p>
           </div>
         </Link>
 

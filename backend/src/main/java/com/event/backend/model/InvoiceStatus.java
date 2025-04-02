@@ -1,8 +1,8 @@
 package com.event.backend.model;
 
 public enum InvoiceStatus {
+    DUE,
     PAID,
-    UNPAID,
-    OVERDUE,
-    PROCESSING
+    PROCESSING,
+    OVERDUE
 }

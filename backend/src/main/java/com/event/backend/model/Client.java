@@ -12,8 +12,8 @@ public class Client {
 
     private String name;
     private String email;
-    private String phoneNumber; // New field for phone number
-    private String physicalAddress; // New field for physical address
+    private String phoneNumber;
+    private String physicalAddress;
 
     // Getters and Setters
     public Long getId() {

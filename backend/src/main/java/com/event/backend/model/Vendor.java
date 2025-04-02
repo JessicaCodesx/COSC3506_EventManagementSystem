@@ -17,9 +17,6 @@ public class Vendor {
 
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL)
-    private List<Event> events; // Relationship with Event
-
     // Getters and Setters
     public Long getId() {
         return id;
@@ -53,11 +50,4 @@ public class Vendor {
         this.phoneNumber = phoneNumber;
     }
 
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events;
-    }
 }

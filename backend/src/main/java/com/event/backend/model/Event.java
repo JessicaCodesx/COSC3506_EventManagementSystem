@@ -3,7 +3,8 @@ package com.event.backend.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -33,7 +34,12 @@ public class Event {
     @Column(name = "base_price")
     private Double basePrice;
 
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
+
+    @ElementCollection
+    @CollectionTable(name = "event_ratings", joinColumns = @JoinColumn(name = "event_id"))
+    @Column(name = "rating")
+    private List<Integer> ratings = new ArrayList<>(); // List to store client ratings
 
     public enum EventStatus {
         PENDING,
@@ -107,6 +113,16 @@ public class Event {
         this.status = status;
     }
 
-    
+    public List<Integer> getRatings() {
+        return ratings;
+    }
+
+    public void addRating(int rating) {
+        this.ratings.add(rating);
+    }
+
+    public double getAverageRating() {
+        return ratings.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+    }
 }
 

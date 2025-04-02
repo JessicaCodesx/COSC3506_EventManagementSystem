@@ -78,4 +78,14 @@ public class EventService {
     public List<Event> getCompletedEvents(Long vendorId) {
         return eventRepository.findByVendorIdAndStatus(vendorId, Event.EventStatus.COMPLETED);
     }
+
+    public Event addRating(Long eventId, int rating) {
+        return eventRepository.findById(eventId).map(event -> {
+            if (rating < 1 || rating > 5) {
+                throw new IllegalArgumentException("Rating must be between 1 and 5.");
+            }
+            event.addRating(rating);
+            return eventRepository.save(event);
+        }).orElseThrow(() -> new IllegalArgumentException("Event not found with ID: " + eventId));
+    }
 }

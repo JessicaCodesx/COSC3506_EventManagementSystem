@@ -66,6 +66,16 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{eventId}/rating")
+    public ResponseEntity<Event> addRating(@PathVariable Long eventId, @RequestParam int rating) {
+        try {
+            Event event = eventService.addRating(eventId, rating);
+            return ResponseEntity.ok(event);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     private class EventPriceCalculator {
         // EventPriceCalculator implementation
         @Autowired

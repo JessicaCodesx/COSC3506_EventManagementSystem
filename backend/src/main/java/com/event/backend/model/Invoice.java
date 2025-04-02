@@ -11,10 +11,14 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double amount;
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private Event event;
+
+    private Double totalAmount;
 
     @Enumerated(EnumType.STRING)
-    private InvoiceStatus status; // Enum for invoice status (DUE, PAID, PROCESSING)
+    private InvoiceStatus status;
 
     private LocalDateTime dueDate;
 
@@ -31,12 +35,20 @@ public class Invoice {
         this.id = id;
     }
 
-    public Double getAmount() {
-        return amount;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public InvoiceStatus getStatus() {

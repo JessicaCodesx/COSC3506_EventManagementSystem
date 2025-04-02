@@ -2,6 +2,7 @@ package com.event.backend.service;
 
 import com.event.backend.model.Invoice;
 import com.event.backend.model.InvoiceStatus;
+import com.event.backend.model.Event;
 import com.event.backend.repository.InvoiceRepository;
 import com.event.backend.repository.UserRepository;
 import com.event.backend.repository.EventRepository;

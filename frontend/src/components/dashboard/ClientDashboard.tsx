@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import '../../styles/DashboardModules.css';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import "../../styles/DashboardModules.css";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   User,
@@ -11,16 +11,18 @@ import {
   InvoiceService,
 } from "../../services/apiService";
 
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import PersonIcon from '@mui/icons-material/Person';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-import RequestPageIcon from '@mui/icons-material/RequestPage';
-import StoreIcon from '@mui/icons-material/Store';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import PersonIcon from "@mui/icons-material/Person";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import EditCalendarIcon from "@mui/icons-material/EditCalendar";
+import RequestPageIcon from "@mui/icons-material/RequestPage";
+import StoreIcon from "@mui/icons-material/Store";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import StarIcon from "@mui/icons-material/Star";
+import MoneyIcon from "@mui/icons-material/CreditCard";
 
 const ClientDashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,19 @@ const ClientDashboard: React.FC = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        setEvents(await EventService.getAllEvents());
+        let eventData;
+
+        // Different API calls based on user role
+        if (role === "ADMIN") {
+          eventData = await EventService.getAllEvents();
+        } else if (role === "CLIENT" && user?.id) {
+          eventData = await EventService.getEventsByClientId(user.id);
+        } else {
+          // For vendors and staff, they would see assigned events
+          // This would be implemented with a different API call
+          eventData = await EventService.getAllEvents();
+        }
+        setEvents(eventData);
       } catch (err: any) {}
     };
 
@@ -40,7 +54,20 @@ const ClientDashboard: React.FC = () => {
 
     const fetchInvoice = async () => {
       try {
-        setInvoices(await InvoiceService.getAllInvoices());
+        let invoiceData;
+
+        // Different API calls based on user role
+        if (role === "ADMIN") {
+          invoiceData = await InvoiceService.getAllInvoices();
+        } else if (role === "CLIENT" && user?.id) {
+          invoiceData = await InvoiceService.getInvoicesByClient(user.id);
+        } else {
+          // For vendors and staff, they would see invoices related to their assignments
+          // This would be implemented with a different API call
+          invoiceData = [];
+        }
+
+        setInvoices(invoiceData);
       } catch (err: any) {}
     };
 
@@ -48,32 +75,32 @@ const ClientDashboard: React.FC = () => {
   }, [role, user?.id]);
 
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'SCHEDULED':
-        return 'status-scheduled';
-      case 'COMPLETED':
-        return 'status-completed';
-      case 'CANCELED':
-        return 'status-canceled';
-      case 'PAID':
-        return 'status-completed';
-      case 'PENDING':
-        return 'status-scheduled';
-      case 'OVERDUE':
-        return 'status-canceled';
+      case "SCHEDULED":
+        return "status-scheduled";
+      case "COMPLETED":
+        return "status-completed";
+      case "CANCELED":
+        return "status-canceled";
+      case "PAID":
+        return "status-completed";
+      case "PENDING":
+        return "status-scheduled";
+      case "OVERDUE":
+        return "status-canceled";
       default:
-        return '';
+        return "";
     }
   };
 
@@ -81,7 +108,10 @@ const ClientDashboard: React.FC = () => {
     <div className="dashboard-container">
       <div className="dashboard-welcome">
         <h1>Welcome to your Client Dashboard</h1>
-        <p>Manage your events, track payments, and connect with vendors all in one place.</p>
+        <p>
+          Manage your events, track payments, and connect with vendors all in
+          one place.
+        </p>
       </div>
 
       <div className="dashboard-summary">
@@ -90,7 +120,7 @@ const ClientDashboard: React.FC = () => {
             <CalendarMonthIcon />
           </div>
           <div className="summary-details">
-            <h3>{events.filter(e => e.status === 'SCHEDULED').length}</h3>
+            <h3>{events.filter((e) => e.status === "SCHEDULED").length}</h3>
             <p>Upcoming Events</p>
           </div>
         </div>
@@ -100,7 +130,7 @@ const ClientDashboard: React.FC = () => {
             <RequestPageIcon />
           </div>
           <div className="summary-details">
-            <h3>{invoices.filter(i => i.status === 'PENDING').length}</h3>
+            <h3>{invoices.filter((i) => i.status === "PENDING").length}</h3>
             <p>Pending Invoices</p>
           </div>
         </div>
@@ -124,7 +154,7 @@ const ClientDashboard: React.FC = () => {
               View All <ArrowForwardIcon />
             </Link>
           </div>
-          
+
           <div className="widget-content">
             {loading ? (
               <div className="loading-spinner">Loading...</div>
@@ -140,18 +170,25 @@ const ClientDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {events.map(event => (
+                  {events.map((event) => (
                     <tr key={event.id}>
                       <td>{event.eventName}</td>
                       <td>{formatDate(event.eventDate)}</td>
                       <td>{event.location}</td>
                       <td>
-                        <span className={`status-badge ${getStatusClass(event.status)}`}>
+                        <span
+                          className={`status-badge ${getStatusClass(
+                            event.status
+                          )}`}
+                        >
                           {event.status}
                         </span>
                       </td>
                       <td>
-                        <Link to={`/events/${event.id}`} className="action-button">
+                        <Link
+                          to={`/events/${event.id}`}
+                          className="action-button"
+                        >
                           <VisibilityIcon />
                         </Link>
                       </td>
@@ -178,7 +215,7 @@ const ClientDashboard: React.FC = () => {
               View All <ArrowForwardIcon />
             </Link>
           </div>
-          
+
           <div className="widget-content">
             {loading ? (
               <div className="loading-spinner">Loading...</div>
@@ -194,23 +231,33 @@ const ClientDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.map(invoice => (
+                  {invoices.map((invoice) => (
                     <tr key={invoice.id}>
                       <td>INV-{invoice.id}</td>
                       <td>${invoice.totalAmount.toFixed(2)}</td>
                       <td>{new Date(invoice.dueDate).toLocaleDateString()}</td>
                       <td>
-                        <span className={`status-badge ${getStatusClass(invoice.status)}`}>
+                        <span
+                          className={`status-badge ${getStatusClass(
+                            invoice.status
+                          )}`}
+                        >
                           {invoice.status}
                         </span>
                       </td>
                       <td>
-                        <Link to={`/invoices/${invoice.id}`} className="action-button">
-                          <VisibilityIcon/>
+                        <Link
+                          to={`/invoices/${invoice.id}`}
+                          className="action-button"
+                        >
+                          <VisibilityIcon />
                         </Link>
-                        {invoice.status === 'PENDING' && (
-                          <Link to={`/invoices/${invoice.id}/pay`} className="action-button pay-button">
-                            <CreditCardIcon/>
+                        {invoice.status === "PENDING" && (
+                          <Link
+                            to={`/invoices/${invoice.id}/pay`}
+                            className="action-button pay-button"
+                          >
+                            <CreditCardIcon />
                           </Link>
                         )}
                       </td>
@@ -220,7 +267,7 @@ const ClientDashboard: React.FC = () => {
               </table>
             ) : (
               <div className="empty-state">
-                <ReceiptIcon/>
+                <ReceiptIcon />
                 <p>No invoices found</p>
               </div>
             )}
@@ -231,14 +278,14 @@ const ClientDashboard: React.FC = () => {
       <div className="dashboard-actions">
         <Link to="/events/create" className="action-card">
           <div className="action-icon">
-            <AddCircleOutlineIcon/>
+            <AddCircleOutlineIcon />
           </div>
           <div className="action-details">
             <h3>Create New Event</h3>
             <p>Plan your next event with our guided setup</p>
           </div>
         </Link>
-        
+
         <Link to="/profile" className="action-card">
           <div className="action-icon">
             <PersonIcon />
@@ -246,6 +293,26 @@ const ClientDashboard: React.FC = () => {
           <div className="action-details">
             <h3>Update Profile</h3>
             <p>Manage your account information</p>
+          </div>
+        </Link>
+
+        <Link to="/events/completed" className="action-card">
+          <div className="action-icon">
+            <StarIcon />
+          </div>
+          <div className="action-details">
+            <h3>Complete Event Reviews</h3>
+            <p>Provide a review for completed events</p>
+          </div>
+        </Link>
+
+        <Link to="/invoices" className="action-card">
+          <div className="action-icon">
+            <MoneyIcon />
+          </div>
+          <div className="action-details">
+            <h3>View Invoices</h3>
+            <p>View Completed and Pending Invoices</p>
           </div>
         </Link>
       </div>

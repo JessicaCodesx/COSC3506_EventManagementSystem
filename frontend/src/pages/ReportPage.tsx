@@ -3,6 +3,9 @@ import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
 import { useAuth } from "../contexts/AuthContext";
 import {
+  Event,
+  User,
+  Invoice,
   EventService,
   UserService,
   InvoiceService,
@@ -13,32 +16,6 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import PendingIcon from "@mui/icons-material/Pending";
-
-interface Event {
-  id: number;
-  eventName: string;
-  location: string;
-  eventDate: string;
-  status: string;
-  client?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-  };
-}
-
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  role: string;
-}
-
-interface Invoice {
-  id: number;
-  status: string;
-  totalAmount: number;
-}
 
 const ReportPage = () => {
   const { user, role } = useAuth();
@@ -77,6 +54,19 @@ const ReportPage = () => {
 
     fetchInvoice();
   }, [role, user?.id]);
+
+  const getAverageClientSatifaction = () => {
+    let numerator = events
+      .filter((x) => x.status === "COMPLETED" && x.rating)
+      .reduce((n, { rating }) => (rating ? n + rating : n), 0);
+
+    let denominator = events.filter(
+      (x) => x.status === "COMPLETED" && x.rating !== undefined
+    ).length;
+
+    console.log("average rating", numerator, denominator, events);
+    return denominator > 0 ? numerator / denominator + " / 5" : "No ratings";
+  };
 
   return (
     <>
@@ -185,7 +175,7 @@ const ReportPage = () => {
                         <InsertEmoticonIcon />
                       </div>
                       <div className="summary-details">
-                        <h3> 4/5 </h3>
+                        <h3>{getAverageClientSatifaction()}</h3>
                         <p>Total Lifetime Average Client Satisfaction</p>
                       </div>
                     </div>

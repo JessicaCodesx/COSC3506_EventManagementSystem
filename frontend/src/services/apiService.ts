@@ -36,6 +36,7 @@ export interface Event {
     lastName: string;
     email: string;
   };
+  rating?: number;
 }
 
 export interface User {
@@ -105,16 +106,10 @@ export const AuthService = {
 };
 
 export const UserService = {
-  getCurrentUser: async () => {
-    // for testing - return dummy data
-    return {
-      "id": 25,
-      "firstName": "Test",
-      "lastName": "Client",
-      "email": "admin@example.com",
-      "password": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc0MzQ3NTQzNCwiZXhwIjoxNzQzNTYxODM0fQ.RGPa1narn9fovVaedkF5oYNHRHYQVQgJXr6PHlJKm5U",
-      "role": "ADMIN"
-  };
+  getCurrentUser: async (email: any) => {
+    if(useMockServices)
+      return MockUserService.getCurrentUser(email);
+
     const response = await api.get('/users/current');
     return response.data;
   },
@@ -185,7 +180,17 @@ export const EventService = {
   },
   
   updateEvent: async (id: number, eventData: any) => {
+    if(useMockServices)
+      return MockEventService.updateEvent(id, eventData);
     const response = await api.put(`/events/${id}`, eventData);
+    return response.data;
+  },
+
+  rateEvent: async (id: number, rating: number) => {
+    if(useMockServices)
+      return MockEventService.rateEvent(id, rating);
+
+    const response = await api.put(`/events/${id}/rating`, rating);
     return response.data;
   },
   

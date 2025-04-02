@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Event, Assignment, EventService, AssignmentService } from "../services/apiService";
+import {
+  Event,
+  Assignment,
+  EventService,
+  AssignmentService,
+} from "../services/apiService";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
 import "../styles/DetailPages.css";
-
-
 
 const EventDetailsPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -19,6 +22,12 @@ const EventDetailsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
+  const [submitting, setSubmitting] = useState(false);
+  const [ratingSaveSucess, setRatingSaveSuccess] = useState<string | null>(
+    null
+  );
+  const [rating, setRating] = useState(3);
+
   useEffect(() => {
     const fetchEventData = async () => {
       if (!eventId) return;
@@ -27,6 +36,7 @@ const EventDetailsPage: React.FC = () => {
       try {
         const eventData = await EventService.getEventById(parseInt(eventId));
         setEvent(eventData);
+        if (eventData.rating) setRating(eventData.rating);
 
         const assignmentData = await AssignmentService.getAssignmentsByEvent(
           parseInt(eventId)
@@ -50,6 +60,35 @@ const EventDetailsPage: React.FC = () => {
       navigate("/events");
     } catch (err: any) {
       setError(err.message || "Failed to delete event");
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    setRating(parseInt(e.target.value));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!eventId) return;
+
+    setSubmitting(true);
+    setError(null);
+    setRatingSaveSuccess(null);
+
+    try {
+      // Combine date and time into a single ISO string
+      // Call API to update event
+      await EventService.rateEvent(parseInt(eventId), rating);
+      setRatingSaveSuccess("Event rating updated successfully!");
+    } catch (err: any) {
+      setError(err.message || "Failed to update event. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -78,6 +117,7 @@ const EventDetailsPage: React.FC = () => {
   };
 
   const canEdit = () => {
+    if (event.status === "COMPLETED") return false;
     if (role === "ADMIN") return true;
     if (role === "CLIENT" && event?.client?.id === user?.id) return true;
     return false;
@@ -170,8 +210,8 @@ const EventDetailsPage: React.FC = () => {
 
                   <div className="detail-section">
                     <div className="section-header">
-                      <h2>Assigned Staff & Vendors</h2>
-                      {canEdit() && (
+                      <h2> Assigned Staff & Vendors</h2>
+                      {canEdit() && event.status != "COMPLETED" && (
                         <Link
                           to={`/events/${eventId}/assign`}
                           className="btn-link"
@@ -243,6 +283,49 @@ const EventDetailsPage: React.FC = () => {
                       </div>
                     )}
                   </div>
+                  {event.status === "COMPLETED" && (
+                    <div className="detail-section">
+                      <div className="section-header">
+                        <h2 className="m-0 p-0">Client Satisfaction Review</h2>
+                      </div>
+                      <p className="mb-3">
+                        Please rate from a scale of 1-5 your vendor experience!
+                      </p>
+                      {ratingSaveSucess && (
+                        <div className="form-message success">
+                          {ratingSaveSucess}
+                        </div>
+                      )}
+                      <div>
+                        <form onSubmit={handleSubmit}>
+                          <div className="d-flex">
+                            <span> 1 </span>
+                            <input
+                              className="flex-fill p-5"
+                              type="range"
+                              id="rating"
+                              name="rating"
+                              min="1"
+                              max="5"
+                              step="1"
+                              value={rating}
+                              onChange={handleChange}
+                            />
+                            <span> 5 </span>
+                          </div>
+                          <div className="d-flex ">
+                            <button
+                              className="btn-primary btn ms-auto"
+                              type="submit"
+                              disabled={submitting}
+                            >
+                              {submitting ? "Submitting..." : "Submit"}
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="detail-footer">

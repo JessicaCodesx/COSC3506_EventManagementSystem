@@ -47,7 +47,8 @@ const MOCK_EVENTS = [
       email: 'client@example.com',
       role: 'CLIENT'
     },
-    description: 'Annual team-building retreat for the company. Activities include workshops, team challenges, and evening social events.'
+    description: 'Annual team-building retreat for the company. Activities include workshops, team challenges, and evening social events.',
+    rating: 0
   },
   {
     id: 2,
@@ -56,13 +57,14 @@ const MOCK_EVENTS = [
     eventDate: '2025-05-10T09:00:00',
     status: 'SCHEDULED',
     client: {
-      id: 25,
+      id: 2,
       firstName: 'Client',
       lastName: 'User',
       email: 'client@example.com',
       role: 'CLIENT'
     },
-    description: 'Launch event for our new product line. Includes presentations, demos, and networking reception.'
+    description: 'Launch event for our new product line. Includes presentations, demos, and networking reception.',
+    rating: 0
   },
   {
     id: 3,
@@ -71,13 +73,14 @@ const MOCK_EVENTS = [
     eventDate: '2025-04-22T10:00:00',
     status: 'COMPLETED',
     client: {
-      id: 25,
+      id: 2,
       firstName: 'Client',
       lastName: 'User',
       email: 'client@example.com',
       role: 'CLIENT'
     },
-    description: 'Team building activities and workshops for the marketing department.'
+    description: 'Team building activities and workshops for the marketing department.',
+    rating: 0
   }
 ];
 
@@ -199,17 +202,17 @@ export const MockAuthService = {
 };
 
 export const MockUserService = {
-  getCurrentUser: async () => {
+  getCurrentUser: async (email: any) => {
     await delay(300);
     
-    const user = MOCK_USERS[0];
+    const index = MOCK_USERS.findIndex(u => u.email === email);
     
-    return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role
+    return index == -1 ? {} : {
+      id: MOCK_USERS[index].id,
+      firstName: MOCK_USERS[index].firstName,
+      lastName: MOCK_USERS[index].lastName,
+      email: MOCK_USERS[index].email,
+      role: MOCK_USERS[index].role
     };
   },
 
@@ -325,6 +328,20 @@ export const MockEventService = {
       ...MOCK_EVENTS[eventIndex],
       ...eventData
     };
+    
+    return MOCK_EVENTS[eventIndex];
+  },
+
+  rateEvent: async (id: number, rating: number) => {
+    await delay(300);
+    
+    const eventIndex = MOCK_EVENTS.findIndex(e => e.id === id);
+    
+    if (eventIndex === -1) {
+      throw new Error('Event not found');
+    }
+    
+    MOCK_EVENTS[eventIndex].rating = rating;
     
     return MOCK_EVENTS[eventIndex];
   },

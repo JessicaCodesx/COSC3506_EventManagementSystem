@@ -46,7 +46,7 @@ Before running the backend, set up the local database:
 mysql -u root -p
 
 CREATE DATABASE `ems-db`;  
-CREATE USER 'emsuser'@'localhost' IDENTIFIED BY 'password';  
+CREATE USER 'emsuser`@'localhost` IDENTIFIED BY 'password';  
 GRANT ALL PRIVILEGES ON `ems-db`.* TO 'emsuser'@'localhost';  
 FLUSH PRIVILEGES;
 ```

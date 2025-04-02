@@ -7,6 +7,12 @@ import {
   UserService,
   InvoiceService,
 } from "../services/apiService";
+import GroupIcon from "@mui/icons-material/Group";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import PendingIcon from "@mui/icons-material/Pending";
 
 interface Event {
   id: number;
@@ -87,7 +93,7 @@ const ReportPage = () => {
                     <h3> Lifetime Report Statistics </h3>
                     <div className="summary-card">
                       <div className="summary-icon">
-                        <i className="fa fa-users"></i>
+                        <GroupIcon />
                       </div>
                       <div className="summary-details">
                         <h3> {users.length} </h3>
@@ -97,7 +103,7 @@ const ReportPage = () => {
 
                     <div className="summary-card mt-2">
                       <div className="summary-icon">
-                        <i className="fa fa-users"></i>
+                        <GroupIcon />
                       </div>
                       <div className="summary-details">
                         <h3>
@@ -109,7 +115,7 @@ const ReportPage = () => {
 
                     <div className="summary-card mt-2">
                       <div className="summary-icon">
-                        <i className="fa fa-users"></i>
+                        <GroupIcon />
                       </div>
                       <div className="summary-details">
                         <h3>
@@ -121,7 +127,7 @@ const ReportPage = () => {
 
                     <div className="summary-card mt-2">
                       <div className="summary-icon">
-                        <i className="fa fa-users"></i>
+                        <CalendarTodayIcon />
                       </div>
                       <div className="summary-details">
                         <h3> {events.length} </h3>
@@ -131,7 +137,7 @@ const ReportPage = () => {
 
                     <div className="summary-card mt-2">
                       <div className="summary-icon">
-                        <i className="fa fa-users"></i>
+                        <AttachMoneyIcon />
                       </div>
                       <div className="summary-details">
                         <h3>
@@ -156,7 +162,7 @@ const ReportPage = () => {
 
                     <div className="summary-card mt-2">
                       <div className="summary-icon">
-                        <i className="fa fa-users"></i>
+                        <AttachMoneyIcon />
                       </div>
                       <div className="summary-details">
                         <h3>
@@ -176,7 +182,7 @@ const ReportPage = () => {
 
                     <div className="summary-card mt-2">
                       <div className="summary-icon">
-                        <i className="fa fa-users"></i>
+                        <InsertEmoticonIcon />
                       </div>
                       <div className="summary-details">
                         <h3> 4/5 </h3>
@@ -190,7 +196,7 @@ const ReportPage = () => {
 
                     <div className="summary-card mt-2">
                       <div className="summary-icon">
-                        <i className="fa fa-users"></i>
+                        <PendingActionsIcon />
                       </div>
                       <div className="summary-details">
                         <h3>
@@ -206,7 +212,7 @@ const ReportPage = () => {
 
                     <div className="summary-card mt-2">
                       <div className="summary-icon">
-                        <i className="fa fa-users"></i>
+                        <PendingIcon />
                       </div>
                       <div className="summary-details">
                         <h3>

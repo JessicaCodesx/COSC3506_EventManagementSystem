@@ -1,45 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { EventService, AssignmentService } from "../services/apiService";
+import { Event, Assignment, EventService, AssignmentService } from "../services/apiService";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
 import "../styles/DetailPages.css";
 
-interface Event {
-  id: number;
-  eventName: string;
-  location: string;
-  eventDate: string;
-  status: string;
-  description?: string;
-  client?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
 
-interface Assignment {
-  id: number;
-  event: {
-    id: number;
-  };
-  vendor?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  staff?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  role: string;
-}
 
 const EventDetailsPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();

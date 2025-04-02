@@ -39,6 +39,8 @@ import EditUserPage from "./pages/EditUserPage";
 
 // Vendor pages
 import VendorAvailabilityPage from "./pages/VendorAvailabilityPage";
+import AssignmentsPage from "./pages/AssignmentsPage";
+import PaymentsList from "./pages/PaymentsList";
 
 // Profile page
 import ProfilePage from "./pages/ProfilePage";
@@ -136,11 +138,12 @@ const App: React.FC = () => {
             <Route
               path="/invoices/create"
               element={
-                <ProtectedRoute allowedRoles={["ADMIN", "CLIENT"]}>
+                <ProtectedRoute allowedRoles={["ADMIN", "VENDOR", "CLIENT"]}>
                   <CreateInvoicePage />
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/invoices/:invoiceId"
               element={
@@ -210,6 +213,24 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/assignments"
+              element={
+                <ProtectedRoute allowedRoles={["VENDOR"]}>
+                  <AssignmentsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/paymentslist"
+              element={
+                <ProtectedRoute allowedRoles={["VENDOR"]}>
+                  <PaymentsList />
                 </ProtectedRoute>
               }
             />

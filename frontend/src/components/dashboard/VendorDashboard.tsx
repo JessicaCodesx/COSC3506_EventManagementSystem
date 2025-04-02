@@ -1,7 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../../styles/DashboardModules.css";
-
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import {
+  User,
+  Event,
+  Invoice,
+  EventService,
+  UserService,
+  InvoiceService,
+  Assignment,
+  AssignmentService,
+  Payment,
+  PaymentService,
+} from "../../services/apiService";
+import { useAuth } from "../../contexts/AuthContext";
+import AddAlertIcon from "@mui/icons-material/AddAlert";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import RequestPageIcon from "@mui/icons-material/RequestPage";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import CheckIcon from "@mui/icons-material/Check";
 // Mock data - in a real app, this would come from API
 const mockAssignments = [
   {
@@ -18,7 +37,7 @@ const mockAssignments = [
     eventName: "Product Launch",
     clientName: "Tech Innovations Inc",
     location: "Downtown Convention Center",
-    eventDate: "2025-05-10T09:00:00",
+    eventDate: "2025-04-05T09:00:00",
     role: "AV Equipment",
     status: "SCHEDULED",
   },
@@ -27,66 +46,94 @@ const mockAssignments = [
     eventName: "Charity Gala",
     clientName: "Global Foundation",
     location: "Grand Ballroom",
-    eventDate: "2025-04-30T18:00:00",
+    eventDate: "2025-04-29T18:00:00",
     role: "Decorations",
     status: "SCHEDULED",
   },
 ];
 
-const mockPayments = [
-  {
-    id: 101,
-    eventId: 1,
-    eventName: "Annual Corporate Retreat",
-    amountPaid: 2500.0,
-    paymentDate: "2025-04-15",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    id: 102,
-    eventId: 2,
-    eventName: "Product Launch",
-    amountPaid: 1750.0,
-    paymentDate: "2025-03-25",
-    paymentMethod: "Credit Card",
-  },
-];
-
 const VendorDashboard: React.FC = () => {
-  const [assignments, setAssignments] = useState(mockAssignments);
-  const [payments, setPayments] = useState(mockPayments);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(false);
+  const { user, role } = useAuth();
+  const [payments, setPayments] = useState<Payment[]>([]);
 
   // In a real app, you would fetch data from API
   useEffect(() => {
-    // Example of how you would fetch data
-    const fetchData = async () => {
+    const fetchAssignments = async () => {
       setLoading(true);
       try {
-        // const token = localStorage.getItem('token');
-        // const vendorId = '1'; // Would come from auth context or state
-        // const assignmentsResponse = await fetch(`http://localhost:8080/api/assignments/vendor/${vendorId}`, {
-        //   headers: { Authorization: `Bearer ${token}` }
-        // });
-        // const assignmentsData = await assignmentsResponse.json();
-        // setAssignments(assignmentsData);
-        // // Fetch payments related to vendor
-        // // This would be a different endpoint in a real API
-        // const paymentsResponse = await fetch(`http://localhost:8080/api/payments/vendor/${vendorId}`, {
-        //   headers: { Authorization: `Bearer ${token}` }
-        // });
-        // const paymentsData = await paymentsResponse.json();
-        // setPayments(paymentsData);
-      } catch (error) {
-        console.error("Error fetching vendor data:", error);
+        let assignmentData;
+        if (user) {
+          assignmentData = await AssignmentService.getAssignmentsByVendor(
+            user.id
+          );
+        }
+        setAssignments(assignmentData);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch events");
       } finally {
         setLoading(false);
       }
     };
 
-    // Comment out for now since we're using mock data
-    // fetchData();
-  }, []);
+    fetchAssignments();
+
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        let eventData;
+        eventData = await EventService.getAllEvents();
+        setEvents(eventData);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch events");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+
+    const fetchPayments = async () => {
+      setLoading(true);
+      try {
+        let paymentData = await PaymentService.getAllPayments();
+        setPayments(paymentData);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch payment information");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPayments();
+  }, [role, user?.id]);
+
+  const getEventDate = (eventID: number, format: boolean) => {
+    let event = getEventInfo(eventID);
+    if (event && format) return formatDate(event.eventDate);
+    else if (event && !format) return event.eventDate;
+
+    return "";
+  };
+
+  const getEventClient = (eventID: number) => {
+    let event = getEventInfo(eventID);
+    if (event && event.client)
+      return (
+        event.client.firstName +
+        " " +
+        event.client.lastName +
+        " " +
+        event.client.email
+      );
+    else {
+      return "";
+    }
+  };
+
+  const getEventInfo = (eventID: number) => {
+    return events.find((x) => x.id == eventID);
+  };
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -105,12 +152,10 @@ const VendorDashboard: React.FC = () => {
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case "SCHEDULED":
+      case "ASSIGNED":
         return "status-scheduled";
-      case "COMPLETED":
+      case "AVAILABLE":
         return "status-completed";
-      case "CANCELED":
-        return "status-canceled";
       default:
         return "";
     }
@@ -118,7 +163,7 @@ const VendorDashboard: React.FC = () => {
 
   // Calculate upcoming assignments (next 7 days)
   const upcomingAssignments = assignments.filter((assignment) => {
-    const eventDate = new Date(assignment.eventDate);
+    const eventDate = new Date(getEventDate(assignment.event.id, false));
     const today = new Date();
     const nextWeek = new Date();
     nextWeek.setDate(today.getDate() + 7);
@@ -132,7 +177,7 @@ const VendorDashboard: React.FC = () => {
   );
 
   return (
-    <div className="dashboard-container">
+    <div className="p-4">
       <div className="dashboard-welcome">
         <h1>Vendor Dashboard</h1>
         <p>
@@ -144,7 +189,7 @@ const VendorDashboard: React.FC = () => {
       <div className="dashboard-summary">
         <div className="summary-card">
           <div className="summary-icon assignments-icon">
-            <i className="fa fa-calendar-check"></i>
+            <AssignmentIcon />
           </div>
           <div className="summary-details">
             <h3>{assignments.length}</h3>
@@ -154,7 +199,7 @@ const VendorDashboard: React.FC = () => {
 
         <div className="summary-card">
           <div className="summary-icon upcoming-icon">
-            <i className="fa fa-clock"></i>
+            <AddAlertIcon />
           </div>
           <div className="summary-details">
             <h3>{upcomingAssignments.length}</h3>
@@ -164,7 +209,7 @@ const VendorDashboard: React.FC = () => {
 
         <div className="summary-card">
           <div className="summary-icon earnings-icon">
-            <i className="fa fa-dollar-sign"></i>
+            <AttachMoneyIcon />
           </div>
           <div className="summary-details">
             <h3>${totalEarnings.toFixed(2)}</h3>
@@ -173,7 +218,7 @@ const VendorDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="dashboard-widgets">
+      <div className="dashboard-widgets" style={{ minHeight: 700 }}>
         <div className="widget assignments-widget">
           <div className="widget-header">
             <h2>Your Assignments</h2>
@@ -194,15 +239,17 @@ const VendorDashboard: React.FC = () => {
                     <th>Date & Time</th>
                     <th>Role</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th>Assign</th>
                   </tr>
                 </thead>
                 <tbody>
                   {assignments.map((assignment) => (
                     <tr key={assignment.id}>
-                      <td>{assignment.eventName}</td>
-                      <td>{assignment.clientName}</td>
-                      <td>{formatDate(assignment.eventDate)}</td>
+                      <td>{getEventInfo(assignment.event.id)?.eventName}</td>
+                      <td>{getEventClient(assignment.event.id)}</td>
+                      <td className="text-nowrap">
+                        {getEventDate(assignment.event.id, true)}
+                      </td>
                       <td>{assignment.role}</td>
                       <td>
                         <span
@@ -218,7 +265,7 @@ const VendorDashboard: React.FC = () => {
                           to={`/assignments/${assignment.id}`}
                           className="action-button"
                         >
-                          <i className="fa fa-eye"></i>
+                          <CheckIcon />
                         </Link>
                       </td>
                     </tr>
@@ -227,7 +274,7 @@ const VendorDashboard: React.FC = () => {
               </table>
             ) : (
               <div className="empty-state">
-                <i className="fa fa-calendar-check"></i>
+                <CheckIcon />
                 <p>No assignments found</p>
               </div>
             )}
@@ -237,7 +284,7 @@ const VendorDashboard: React.FC = () => {
         <div className="widget payments-widget">
           <div className="widget-header">
             <h2>Recent Payments</h2>
-            <Link to="/payments" className="view-all-link">
+            <Link to="/paymentslist" className="view-all-link">
               View All <i className="fa fa-arrow-right"></i>
             </Link>
           </div>
@@ -277,19 +324,29 @@ const VendorDashboard: React.FC = () => {
       </div>
 
       <div className="dashboard-actions">
-        <Link to="/services" className="action-card">
+        <Link to="/assignments" className="action-card">
           <div className="action-icon">
-            <i className="fa fa-cog"></i>
+            <AssignmentIcon />
           </div>
           <div className="action-details">
-            <h3>Manage Services</h3>
-            <p>Update your service offerings and pricing</p>
+            <h3>View Assignments</h3>
+            <p>See a list of your scheduled and completed assignments</p>
+          </div>
+        </Link>
+
+        <Link to="/invoices/create" className="action-card">
+          <div className="action-icon">
+            <RequestPageIcon />
+          </div>
+          <div className="action-details">
+            <h3>Submit Invoices</h3>
+            <p>Submit an invoice for services rendered</p>
           </div>
         </Link>
 
         <Link to="/availability" className="action-card">
           <div className="action-icon">
-            <i className="fa fa-calendar-alt"></i>
+            <CalendarMonthIcon />
           </div>
           <div className="action-details">
             <h3>Set Availability</h3>
@@ -299,7 +356,7 @@ const VendorDashboard: React.FC = () => {
 
         <Link to="/profile" className="action-card">
           <div className="action-icon">
-            <i className="fa fa-id-card"></i>
+            <SyncAltIcon />
           </div>
           <div className="action-details">
             <h3>Update Profile</h3>

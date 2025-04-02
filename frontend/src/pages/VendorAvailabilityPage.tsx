@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -10,6 +10,8 @@ import Modal from "@mui/material/Modal";
 
 const VendorAvailabilityPage: React.FC = () => {
   const { user, role } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   // for modal
   const [open, setOpen] = useState(false);
@@ -113,6 +115,16 @@ const VendorAvailabilityPage: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => navigate(-1)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </main>
         </div>

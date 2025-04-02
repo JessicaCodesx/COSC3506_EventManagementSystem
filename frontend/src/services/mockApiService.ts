@@ -54,7 +54,7 @@ const MOCK_EVENTS = [
     id: 2,
     eventName: 'Product Launch',
     location: 'Downtown Convention Center',
-    eventDate: '2025-05-10T09:00:00',
+    eventDate: '2025-04-04T09:00:00',
     status: 'SCHEDULED',
     client: {
       id: 2,
@@ -132,14 +132,75 @@ const MOCK_INVOICES = [
   }
 ];
 
+const MOCK_PAYMENTS = [
+  {
+    id: 101,
+    eventId: 1,
+    eventName: "Annual Corporate Retreat",
+    amountPaid: 2500.0,
+    paymentDate: "2025-04-15",
+    paymentMethod: "Bank Transfer",
+    vendor: {
+      id: 1,
+      firstName: "Catering",
+      lastName: "Essentials",
+      email: "catering.essentials@exsample.com",
+    },
+  },
+  {
+    id: 102,
+    eventId: 2,
+    eventName: "Product Launch",
+    amountPaid: 1750.0,
+    paymentDate: "2025-03-25",
+    paymentMethod: "Credit Card",
+    vendor: {
+      id: 1,
+      firstName: "Catering",
+      lastName: "Essentials",
+      email: "catering.essentials@exsample.com",
+    },
+  },
+
+  {
+    id: 102,
+    eventId: 2,
+    eventName: "Mixer",
+    amountPaid: 20000.0,
+    paymentDate: "2024-02-25",
+    paymentMethod: "Credit Card",
+    vendor: {
+      id: 1,
+      firstName: "Mixer",
+      lastName: "For All",
+      email: "mixer@exsample.com",
+    },
+  },
+
+  {
+    id: 102,
+    eventId: 2,
+    eventName: "TedTalk",
+    amountPaid: 532.0,
+    paymentDate: "2025-01-17",
+    paymentMethod: "Credit Card",
+    vendor: {
+      id: 1,
+      firstName: "ted",
+      lastName: "talk",
+      email: "tedtalk@exsample.com",
+    },
+  },
+];
+
 const MOCK_ASSIGNMENTS = [
   {
     id: 1,
     event: {
-      id: 1,
+      id: 2,
     },
     vendor: {
-      id: 1,
+      id: 3,
       firstName: "Catering",
       lastName: "Essentials",
       email: "catering.essentials@exsample.com",
@@ -147,7 +208,44 @@ const MOCK_ASSIGNMENTS = [
     staff: {
       id: 1
     },
-    role: "Catering"
+    role: "Catering", 
+    status: "ASSIGNED"
+  },
+
+  {
+    id: 2,
+    event: {
+      id: 1,
+    },
+    vendor: {
+      id: 3,
+      firstName: "Ski Bindings",
+      lastName: "Winter",
+      email: "skibindings.winters@exsample.com",
+    },
+    staff: {
+      id: 1
+    },
+    role: "Ski Equipment",
+    status: "ASSIGNED"
+  },
+
+  {
+    id: 3,
+    event: {
+      id: 1,
+    },
+    vendor: {
+      id: 3,
+      firstName: "Butler & Maids",
+      lastName: "Service",
+      email: "butlerandmaids.service@exsample.com",
+    },
+    staff: {
+      id: 1
+    },
+    role: "Service",
+    status: "AVAILABLE"
   }
 ]
 
@@ -196,14 +294,14 @@ export const MockAuthService = {
   },
   
   verifyToken: async () => {
-    await delay(200);
+    await delay(100);
     return { valid: true };
   }
 };
 
 export const MockUserService = {
   getCurrentUser: async (email: any) => {
-    await delay(300);
+    await delay(150);
     
     const index = MOCK_USERS.findIndex(u => u.email === email);
     
@@ -217,7 +315,7 @@ export const MockUserService = {
   },
 
   createUser: async (userData: any) => {
-    await delay(300);
+    await delay(150);
     
     const newUser = {
       id: MOCK_USERS.length + 1,
@@ -230,7 +328,7 @@ export const MockUserService = {
   },
   
   updateProfile: async (userData: any) => {
-    await delay(300);
+    await delay(150);
     
     const userIndex = MOCK_USERS.findIndex(u => u.id === userData.id);
     
@@ -247,7 +345,7 @@ export const MockUserService = {
   },
   
   getAllUsers: async () => {
-    await delay(300);
+    await delay(150);
     
     return MOCK_USERS.map(u => ({
       id: u.id,
@@ -259,7 +357,7 @@ export const MockUserService = {
   },
   
   getUserById: async (id: number) => {
-    await delay(200);
+    await delay(100);
     
     const user = MOCK_USERS.find(u => u.id === id);
     
@@ -363,7 +461,7 @@ export const MockEventService = {
 
 export const MockInvoiceService = {
   createInvoice: async (invoiceData: any) => {
-    await delay(300);
+    await delay(150);
     
     const newInvoice = {
       id: MOCK_INVOICES.length + 1,
@@ -376,12 +474,12 @@ export const MockInvoiceService = {
   },
   
   getAllInvoices: async () => {
-    await delay(300);
+    await delay(150);
     return [...MOCK_INVOICES];
   },
   
   getInvoiceById: async (id: number) => {
-    await delay(200);
+    await delay(100);
     
     const invoice = MOCK_INVOICES.find(e => e.id === id);
     
@@ -393,19 +491,19 @@ export const MockInvoiceService = {
   },
   
   getInvoicesByClient: async (clientId: number) => {
-    await delay(300);
+    await delay(150);
     
     return MOCK_INVOICES.filter(e => e.client && e.client.id === clientId);
   },
 
   getInvoicesByEvent: async (eventId: number) => {
-    await delay(300);
+    await delay(150);
     
     return MOCK_INVOICES.filter(e => e.event && e.event.id === eventId);
   },
   
   updateInvoice: async (id: number, invoiceData: any) => {
-    await delay(300);
+    await delay(150);
     
     const index = MOCK_INVOICES.findIndex(e => e.id === id);
     
@@ -422,7 +520,7 @@ export const MockInvoiceService = {
   },
   
   deleteInvoice: async (id: number) => {
-    await delay(300);
+    await delay(150);
     
     const index = MOCK_INVOICES.findIndex(e => e.id === id);
     
@@ -436,9 +534,25 @@ export const MockInvoiceService = {
   }
 };
 
+export const MockPaymentService = {
+ getAllPayments: async () => {
+  await delay(150)
+
+  return MOCK_PAYMENTS;
+ },
+
+  getPaymentsByVendor: async (vendorId: number) => {
+  await delay(150);
+  
+  return MOCK_PAYMENTS.filter(e => e.vendor && e.vendor.id === vendorId);
+}
+};
+
+
+
 export const MockAssignmentService = {
   createAssignment: async (assignmentData: any) => {
-    await delay(300);
+    await delay(150);
     
     const newAssignment = {
       id: MOCK_INVOICES.length + 1,
@@ -451,25 +565,25 @@ export const MockAssignmentService = {
   },
 
   getAssignmentsByEvent: async (eventId: number) => {
-    await delay(300);
+    await delay(150);
     
     return MOCK_ASSIGNMENTS.filter(e => e.event && e.event.id === eventId);
   },
 
   getAssignmentsByVendor: async (vendorId: number) => {
-    await delay(300);
+    await delay(150);
     
     return MOCK_ASSIGNMENTS.filter(e => e.vendor && e.vendor.id === vendorId);
   },
 
   getAssignmentsByStaff: async (staffId: number) => {
-    await delay(300);
+    await delay(150);
     
     return MOCK_ASSIGNMENTS.filter(e => e.staff && e.staff.id === staffId);
   },
   
   deleteAssignment: async (id: number) => {
-    await delay(300);
+    await delay(150);
     
     const index = MOCK_ASSIGNMENTS.findIndex(e => e.id === id);
     

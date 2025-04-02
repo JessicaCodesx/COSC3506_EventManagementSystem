@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { InvoiceService } from '../services/apiService';
-import { useAuth } from '../contexts/AuthContext';
-import Sidebar from '../components/Sidebar';
-import DashboardHeader from '../components/DashboardHeader';
-import '../styles/DetailPages.css';
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { InvoiceService } from "../services/apiService";
+import { useAuth } from "../contexts/AuthContext";
+import Sidebar from "../components/Sidebar";
+import DashboardHeader from "../components/DashboardHeader";
+import "../styles/DetailPages.css";
 
 interface Invoice {
   id: number;
@@ -33,64 +33,70 @@ interface Payment {
 
 // Mock payments data for simulation
 const mockPayments: Payment[] = [
-  { 
-    id: 1001, 
-    amountPaid: 2500.00, 
-    paymentDate: '2025-04-05', 
-    paymentMethod: 'Credit Card' 
+  {
+    id: 1001,
+    amountPaid: 2500.0,
+    paymentDate: "2025-04-05",
+    paymentMethod: "Credit Card",
   },
-  { 
-    id: 1002, 
-    amountPaid: 1750.00, 
-    paymentDate: '2025-03-20', 
-    paymentMethod: 'Bank Transfer' 
-  }
+  {
+    id: 1002,
+    amountPaid: 1750.0,
+    paymentDate: "2025-03-20",
+    paymentMethod: "Bank Transfer",
+  },
 ];
 
 const InvoiceDetailsPage: React.FC = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
   const { user, role } = useAuth();
-  
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInvoiceData = async () => {
       if (!invoiceId) return;
-      
+
       setLoading(true);
       try {
-        const invoiceData = await InvoiceService.getInvoiceById(parseInt(invoiceId));
+        const invoiceData = await InvoiceService.getInvoiceById(
+          parseInt(invoiceId)
+        );
         setInvoice(invoiceData);
-        
+
         // Simulate payment data based on invoice status
-        if (invoiceData.status === 'PAID') {
-          setPayments([{
-            id: 1000 + parseInt(invoiceId),
-            amountPaid: invoiceData.totalAmount,
-            paymentDate: new Date().toISOString().split('T')[0],
-            paymentMethod: 'Credit Card'
-          }]);
-        } else if (invoiceData.status === 'PENDING' && Math.random() > 0.7) {
+        if (invoiceData.status === "PAID") {
+          setPayments([
+            {
+              id: 1000 + parseInt(invoiceId),
+              amountPaid: invoiceData.totalAmount,
+              paymentDate: new Date().toISOString().split("T")[0],
+              paymentMethod: "Credit Card",
+            },
+          ]);
+        } else if (invoiceData.status === "PENDING" && Math.random() > 0.7) {
           // Sometimes show partial payment for pending invoices
-          setPayments([{
-            id: 1000 + parseInt(invoiceId),
-            amountPaid: invoiceData.totalAmount * 0.5,
-            paymentDate: new Date().toISOString().split('T')[0],
-            paymentMethod: 'Bank Transfer'
-          }]);
+          setPayments([
+            {
+              id: 1000 + parseInt(invoiceId),
+              amountPaid: invoiceData.totalAmount * 0.5,
+              paymentDate: new Date().toISOString().split("T")[0],
+              paymentMethod: "Bank Transfer",
+            },
+          ]);
         } else {
           setPayments([]);
         }
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch invoice details');
+        setError(err.message || "Failed to fetch invoice details");
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchInvoiceData();
   }, [invoiceId]);
 
@@ -99,22 +105,22 @@ const InvoiceDetailsPage: React.FC = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'PAID':
-        return 'status-completed';
-      case 'PENDING':
-        return 'status-scheduled';
-      case 'OVERDUE':
-        return 'status-canceled';
+      case "PAID":
+        return "status-completed";
+      case "PENDING":
+        return "status-scheduled";
+      case "OVERDUE":
+        return "status-canceled";
       default:
-        return '';
+        return "";
     }
   };
 
@@ -126,15 +132,24 @@ const InvoiceDetailsPage: React.FC = () => {
     if (!invoice) return 0;
     return invoice.totalAmount - calculateAmountPaid();
   };
-  
+
   const canEdit = () => {
-    if (role === 'ADMIN') return true;
-    if (role === 'CLIENT' && invoice?.client.id === user?.id && invoice?.status === 'PENDING') return true;
+    if (role === "ADMIN") return true;
+    if (
+      role === "CLIENT" &&
+      invoice?.client.id === user?.id &&
+      invoice?.status === "PENDING"
+    )
+      return true;
     return false;
   };
-  
+
   const canPay = () => {
-    return role === 'CLIENT' && invoice?.client.id === user?.id && invoice?.status === 'PENDING';
+    return (
+      role === "CLIENT" &&
+      invoice?.client.id === user?.id &&
+      invoice?.status === "PENDING"
+    );
   };
 
   return (
@@ -157,19 +172,29 @@ const InvoiceDetailsPage: React.FC = () => {
               <>
                 <div className="detail-header">
                   <div className="detail-title">
-                    <h1>Invoice #{invoice.id.toString().padStart(4, '0')}</h1>
-                    <span className={`status-badge ${getStatusClass(invoice.status)}`}>
+                    <h1>Invoice #{invoice.id.toString().padStart(4, "0")}</h1>
+                    <span
+                      className={`status-badge ${getStatusClass(
+                        invoice.status
+                      )}`}
+                    >
                       {invoice.status}
                     </span>
                   </div>
                   <div className="detail-actions">
                     {canEdit() && (
-                      <Link to={`/invoices/${invoiceId}/edit`} className="btn btn-secondary">
+                      <Link
+                        to={`/invoices/${invoiceId}/edit`}
+                        className="btn btn-secondary"
+                      >
                         <i className="fa fa-edit"></i> Edit
                       </Link>
                     )}
                     {canPay() && (
-                      <Link to={`/invoices/${invoiceId}/pay`} className="btn btn-primary">
+                      <Link
+                        to={`/invoices/${invoiceId}/pay`}
+                        className="btn btn-primary"
+                      >
                         <i className="fa fa-credit-card"></i> Pay Now
                       </Link>
                     )}
@@ -182,7 +207,9 @@ const InvoiceDetailsPage: React.FC = () => {
                     <div className="detail-grid">
                       <div className="detail-item">
                         <span className="detail-label">Invoice Number</span>
-                        <span className="detail-value">INV-{invoice.id.toString().padStart(4, '0')}</span>
+                        <span className="detail-value">
+                          INV-{invoice.id.toString().padStart(4, "0")}
+                        </span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Event</span>
@@ -194,24 +221,31 @@ const InvoiceDetailsPage: React.FC = () => {
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Due Date</span>
-                        <span className="detail-value">{formatDate(invoice.dueDate)}</span>
+                        <span className="detail-value">
+                          {formatDate(invoice.dueDate)}
+                        </span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Status</span>
-                        <span className={`status-badge ${getStatusClass(invoice.status)}`}>
+                        <span
+                          className={`status-badge ${getStatusClass(
+                            invoice.status
+                          )}`}
+                        >
                           {invoice.status}
                         </span>
                       </div>
-                      {role === 'ADMIN' && (
+                      {role === "ADMIN" && (
                         <div className="detail-item">
                           <span className="detail-label">Client</span>
                           <span className="detail-value">
-                            {invoice.client.firstName} {invoice.client.lastName} ({invoice.client.email})
+                            {invoice.client.firstName} {invoice.client.lastName}{" "}
+                            ({invoice.client.email})
                           </span>
                         </div>
                       )}
                     </div>
-                    
+
                     {invoice.notes && (
                       <div className="detail-description">
                         <h3>Notes</h3>
@@ -225,22 +259,28 @@ const InvoiceDetailsPage: React.FC = () => {
                     <div className="invoice-summary">
                       <div className="summary-row">
                         <span>Total Amount:</span>
-                        <span className="summary-amount">{formatCurrency(invoice.totalAmount)}</span>
+                        <span className="summary-amount">
+                          {formatCurrency(invoice.totalAmount)}
+                        </span>
                       </div>
                       <div className="summary-row">
                         <span>Amount Paid:</span>
-                        <span className="summary-amount">{formatCurrency(calculateAmountPaid())}</span>
+                        <span className="summary-amount">
+                          {formatCurrency(calculateAmountPaid())}
+                        </span>
                       </div>
                       <div className="summary-row summary-balance">
                         <span>Balance Due:</span>
-                        <span className="summary-amount balance">{formatCurrency(calculateBalance())}</span>
+                        <span className="summary-amount balance">
+                          {formatCurrency(calculateBalance())}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="detail-section">
                     <h2>Payment History</h2>
-                    
+
                     {payments.length > 0 ? (
                       <div className="detail-table-container">
                         <table className="detail-table">
@@ -253,9 +293,11 @@ const InvoiceDetailsPage: React.FC = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {payments.map(payment => (
+                            {payments.map((payment) => (
                               <tr key={payment.id}>
-                                <td>PAY-{payment.id.toString().padStart(4, '0')}</td>
+                                <td>
+                                  PAY-{payment.id.toString().padStart(4, "0")}
+                                </td>
                                 <td>{formatDate(payment.paymentDate)}</td>
                                 <td>{formatCurrency(payment.amountPaid)}</td>
                                 <td>{payment.paymentMethod}</td>
@@ -268,7 +310,10 @@ const InvoiceDetailsPage: React.FC = () => {
                       <div className="detail-empty-state">
                         <p>No payments have been made yet.</p>
                         {canPay() && (
-                          <Link to={`/invoices/${invoiceId}/pay`} className="btn-primary">
+                          <Link
+                            to={`/invoices/${invoiceId}/pay`}
+                            className="btn-primary"
+                          >
                             <i className="fa fa-credit-card"></i> Make Payment
                           </Link>
                         )}
@@ -278,8 +323,8 @@ const InvoiceDetailsPage: React.FC = () => {
                 </div>
 
                 <div className="detail-footer">
-                  <Link to="/invoices" className="btn btn-secondary">
-                    <i className="fa fa-arrow-left"></i> Back to Invoices
+                  <Link to="/dashboard" className="btn btn-secondary">
+                    <i className="fa fa-arrow-left"></i> Back
                   </Link>
                 </div>
               </>

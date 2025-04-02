@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MockAuthService, MockInvoiceService, MockUserService, MockEventService, MockAssignmentService } from './mockApiService';
+import { MockAuthService, MockInvoiceService, MockUserService, MockEventService, MockAssignmentService, MockPaymentService } from './mockApiService';
 
 const useMockServices = true;
 
@@ -70,6 +70,22 @@ export interface Assignment {
     email: string;
   };
   role: string;
+  status: string;
+}
+
+export interface Payment {
+  id: number;
+  eventId: number;
+  eventName: string;
+  amountPaid: number;
+  paymentDate: string;
+  paymentMethod: string;
+  vendor?: {
+    id: number;
+    firstName: string;
+    lastNnme: string;
+    email: string;
+  }
 }
 
 
@@ -319,4 +335,14 @@ export const ReportService = {
     const response = await api.get('/reports/overdue-invoices');
     return response.data;
   }
+};
+
+export const PaymentService = {
+ getAllPayments: async () => {
+  return MockPaymentService.getAllPayments();
+ },
+
+  getPaymentsByVendor: async (vendorId: number) => {
+  return MockPaymentService.getPaymentsByVendor(vendorId);
+}
 };

@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { InvoiceService, EventService, UserService } from '../services/apiService';
-import { useAuth } from '../contexts/AuthContext';
-import Sidebar from '../components/Sidebar';
-import DashboardHeader from '../components/DashboardHeader';
-import '../styles/FormPages.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  InvoiceService,
+  EventService,
+  UserService,
+} from "../services/apiService";
+import { useAuth } from "../contexts/AuthContext";
+import Sidebar from "../components/Sidebar";
+import DashboardHeader from "../components/DashboardHeader";
+import "../styles/FormPages.css";
 
 interface Event {
   id: number;
@@ -32,15 +36,16 @@ const CreateInvoicePage: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [clients, setClients] = useState<User[]>([]);
-  const [selectedEventDetails, setSelectedEventDetails] = useState<Event | null>(null);
-  
+  const [selectedEventDetails, setSelectedEventDetails] =
+    useState<Event | null>(null);
+
   const [formData, setFormData] = useState({
-    eventId: '',
-    clientId: '',
-    totalAmount: '',
-    dueDate: '',
-    status: 'PENDING',
-    notes: ''
+    eventId: "",
+    clientId: "",
+    totalAmount: "",
+    dueDate: "",
+    status: "PENDING",
+    notes: "",
   });
 
   useEffect(() => {
@@ -49,42 +54,48 @@ const CreateInvoicePage: React.FC = () => {
         // Fetch events
         const eventsData = await EventService.getAllEvents();
         setEvents(eventsData);
-        
+
         // If admin, fetch clients
-        if (role === 'ADMIN') {
+        if (role === "ADMIN") {
           const usersData = await UserService.getAllUsers();
           // Filter clients only
-          setClients(usersData.filter((user: User) => user.role === 'CLIENT'));
+          setClients(usersData.filter((user: User) => user.role === "CLIENT"));
         }
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch data');
+        setError(err.message || "Failed to fetch data");
       }
     };
-    
+
     fetchData();
   }, [role]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
-    
+
     // If event is selected, update selectedEventDetails and clientId
-    if (name === 'eventId' && value) {
-      const selectedEvent = events.find(event => event.id.toString() === value);
+    if (name === "eventId" && value) {
+      const selectedEvent = events.find(
+        (event) => event.id.toString() === value
+      );
       if (selectedEvent) {
         setSelectedEventDetails(selectedEvent);
         // Update clientId based on the selected event
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           [name]: value,
-          clientId: selectedEvent.client.id.toString()
+          clientId: selectedEvent.client.id.toString(),
         }));
         return;
       }
     }
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -102,19 +113,19 @@ const CreateInvoicePage: React.FC = () => {
         totalAmount: parseFloat(formData.totalAmount),
         dueDate: formData.dueDate,
         status: formData.status,
-        notes: formData.notes
+        notes: formData.notes,
       };
 
       // Call API to create invoice
       const newInvoice = await InvoiceService.createInvoice(invoiceData);
-      setSuccess('Invoice created successfully!');
-      
+      setSuccess("Invoice created successfully!");
+
       // Redirect to invoice details after a short delay
       setTimeout(() => {
         navigate(`/invoices/${newInvoice.id}`);
       }, 1500);
     } catch (err: any) {
-      setError(err.message || 'Failed to create invoice');
+      setError(err.message || "Failed to create invoice");
     } finally {
       setLoading(false);
     }
@@ -123,7 +134,7 @@ const CreateInvoicePage: React.FC = () => {
   // Set min due date to tomorrow
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDueDate = tomorrow.toISOString().split('T')[0];
+  const minDueDate = tomorrow.toISOString().split("T")[0];
 
   return (
     <div className="dashboard-page">
@@ -151,7 +162,7 @@ const CreateInvoicePage: React.FC = () => {
                   required
                 >
                   <option value="">-- Select an event --</option>
-                  {events.map(event => (
+                  {events.map((event) => (
                     <option key={event.id} value={event.id}>
                       {event.eventName}
                     </option>
@@ -159,7 +170,7 @@ const CreateInvoicePage: React.FC = () => {
                 </select>
               </div>
 
-              {role === 'ADMIN' && (
+              {role === "ADMIN" && (
                 <div className="form-group">
                   <label htmlFor="clientId">Client *</label>
                   <select
@@ -171,7 +182,7 @@ const CreateInvoicePage: React.FC = () => {
                     disabled={!!selectedEventDetails} // Disable if event is selected
                   >
                     <option value="">-- Select a client --</option>
-                    {clients.map(client => (
+                    {clients.map((client) => (
                       <option key={client.id} value={client.id}>
                         {client.firstName} {client.lastName} ({client.email})
                       </option>
@@ -179,7 +190,9 @@ const CreateInvoicePage: React.FC = () => {
                   </select>
                   {selectedEventDetails && (
                     <small className="form-hint">
-                      Client automatically selected from event: {selectedEventDetails.client.firstName} {selectedEventDetails.client.lastName}
+                      Client automatically selected from event:{" "}
+                      {selectedEventDetails.client.firstName}{" "}
+                      {selectedEventDetails.client.lastName}
                     </small>
                   )}
                 </div>
@@ -240,20 +253,20 @@ const CreateInvoicePage: React.FC = () => {
               </div>
 
               <div className="form-actions">
-                <button 
-                  type="button" 
-                  className="btn-secondary" 
-                  onClick={() => navigate('/invoices')}
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => navigate(-1)}
                   disabled={loading}
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="btn-primary"
                   disabled={loading}
                 >
-                  {loading ? 'Creating...' : 'Create Invoice'}
+                  {loading ? "Creating..." : "Create Invoice"}
                 </button>
               </div>
             </form>

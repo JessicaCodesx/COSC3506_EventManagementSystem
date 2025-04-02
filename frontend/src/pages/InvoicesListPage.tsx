@@ -114,11 +114,11 @@ const InvoicesListPage: React.FC = () => {
                 <h1>Invoices</h1>
                 <p>Manage your invoices</p>
               </div>
-              {(role === "ADMIN" || role === "CLIENT") && (
+              {/* {(role === "ADMIN" || role === "CLIENT") && (
                 <Link to="/invoices/create" className="btn-primary">
                   <i className="fa fa-plus"></i> Create Invoice
                 </Link>
-              )}
+              )} */}
             </div>
 
             <div className="list-filter-container">

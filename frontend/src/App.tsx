@@ -77,10 +77,20 @@ const App: React.FC = () => {
               path="/events"
               element={
                 <ProtectedRoute>
-                  <EventsListPage />
+                  <EventsListPage status="ALL" />
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/events/completed"
+              element={
+                <ProtectedRoute>
+                  <EventsListPage status="COMPLETED" />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/events/create"
               element={

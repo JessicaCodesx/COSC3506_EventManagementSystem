@@ -1,59 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserService } from '../services/apiService';
-import { useAuth } from '../contexts/AuthContext';
-import Sidebar from '../components/Sidebar';
-import DashboardHeader from '../components/DashboardHeader';
-import '../styles/FormPages.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserService } from "../services/apiService";
+import { useAuth } from "../contexts/AuthContext";
+import Sidebar from "../components/Sidebar";
+import DashboardHeader from "../components/DashboardHeader";
+import "../styles/FormPages.css";
 
 const ProfilePage: React.FC = () => {
   const { user, role } = useAuth();
   const navigate = useNavigate();
-  
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) return;
-      
+
       setLoading(true);
       try {
-        const userData = await UserService.getCurrentUser();
-        
+        const userData = await UserService.getCurrentUser(
+          localStorage.getItem("userEmail")
+        );
+
         // Set form data
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           firstName: userData.firstName,
           lastName: userData.lastName,
-          email: userData.email
+          email: userData.email,
         }));
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch user profile');
+        setError(err.message || "Failed to fetch user profile");
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchUserProfile();
   }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -62,30 +64,30 @@ const ProfilePage: React.FC = () => {
     if (!formData.newPassword && !formData.confirmPassword) {
       return true;
     }
-    
+
     if (formData.newPassword.length < 8) {
-      setError('New password must be at least 8 characters long');
+      setError("New password must be at least 8 characters long");
       return false;
     }
-    
+
     if (formData.newPassword !== formData.confirmPassword) {
-      setError('New passwords do not match');
+      setError("New passwords do not match");
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) return;
-    
+
     // Validate password if changing
     if (!validatePassword()) {
       return;
     }
-    
+
     setSubmitting(true);
     setError(null);
     setSuccess(null);
@@ -96,9 +98,9 @@ const ProfilePage: React.FC = () => {
         id: user.id,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email
+        email: formData.email,
       };
-      
+
       // Only include password fields if changing password
       if (formData.currentPassword && formData.newPassword) {
         userData.currentPassword = formData.currentPassword;
@@ -107,17 +109,17 @@ const ProfilePage: React.FC = () => {
 
       // Call API to update user
       await UserService.updateProfile(userData);
-      setSuccess('Profile updated successfully!');
-      
+      setSuccess("Profile updated successfully!");
+
       // Clear password fields
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       }));
     } catch (err: any) {
-      setError(err.message || 'Failed to update profile');
+      setError(err.message || "Failed to update profile");
     } finally {
       setSubmitting(false);
     }
@@ -144,7 +146,7 @@ const ProfilePage: React.FC = () => {
               <form onSubmit={handleSubmit} className="form-container">
                 <div className="form-section">
                   <h2>Personal Information</h2>
-                  
+
                   <div className="form-row">
                     <div className="form-group">
                       <label htmlFor="firstName">First Name *</label>
@@ -186,8 +188,10 @@ const ProfilePage: React.FC = () => {
 
                 <div className="form-section">
                   <h2>Change Password</h2>
-                  <p className="section-description">Leave blank if you don't want to change your password</p>
-                  
+                  <p className="section-description">
+                    Leave blank if you don't want to change your password
+                  </p>
+
                   <div className="form-group">
                     <label htmlFor="currentPassword">Current Password</label>
                     <input
@@ -211,11 +215,15 @@ const ProfilePage: React.FC = () => {
                         onChange={handleChange}
                         placeholder="Enter new password"
                       />
-                      <small className="form-hint">Must be at least 8 characters long</small>
+                      <small className="form-hint">
+                        Must be at least 8 characters long
+                      </small>
                     </div>
 
                     <div className="form-group">
-                      <label htmlFor="confirmPassword">Confirm New Password</label>
+                      <label htmlFor="confirmPassword">
+                        Confirm New Password
+                      </label>
                       <input
                         type="password"
                         id="confirmPassword"
@@ -229,20 +237,20 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 <div className="form-actions">
-                  <button 
-                    type="button" 
-                    className="btn-secondary" 
-                    onClick={() => navigate('/dashboard')}
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => navigate("/dashboard")}
                     disabled={submitting}
                   >
                     Cancel
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn-primary"
                     disabled={submitting}
                   >
-                    {submitting ? 'Saving Changes...' : 'Save Changes'}
+                    {submitting ? "Saving Changes..." : "Save Changes"}
                   </button>
                 </div>
               </form>

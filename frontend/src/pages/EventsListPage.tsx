@@ -1,33 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { EventService } from "../services/apiService";
+import { Event, EventService } from "../services/apiService";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
 import "../styles/ListPages.css";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
+import StarIcon from "@mui/icons-material/Star";
 
-interface Event {
-  id: number;
-  eventName: string;
-  location: string;
-  eventDate: string;
+interface PropComplete {
   status: string;
-  client?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-  };
 }
 
-const EventsListPage: React.FC = () => {
+const EventsListPage: React.FC<PropComplete> = ({ status }) => {
   const { user, role } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState(status);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -103,7 +95,16 @@ const EventsListPage: React.FC = () => {
             <div className="list-page-header">
               <div className="list-title">
                 <h1>Events</h1>
-                <p>Manage your events</p>
+                <p>
+                  Manage your events{" "}
+                  {statusFilter === "COMPLETED" && (
+                    <span>
+                      {" "}
+                      - click on the star to review completed event
+                      transactions.{" "}
+                    </span>
+                  )}
+                </p>
               </div>
               <Link to="/events/create" className="btn-primary">
                 <i className="fa fa-plus"></i> Create Event
@@ -174,6 +175,13 @@ const EventsListPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="actions-cell">
+                          <Link
+                            to={`/events/${event.id}`}
+                            className="action-button"
+                            title="Review"
+                          >
+                            <StarIcon />
+                          </Link>
                           <Link
                             to={`/events/${event.id}`}
                             className="action-button"

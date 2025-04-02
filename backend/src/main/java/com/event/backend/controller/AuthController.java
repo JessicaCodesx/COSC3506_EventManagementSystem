@@ -1,5 +1,6 @@
 package com.event.backend.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,16 +32,37 @@ public class AuthController {
     private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> payload) {
-        String email = payload.get("email");
-        String password = payload.get("password");
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
+        String email = credentials.get("email");
+        String password = credentials.get("password");
 
+        // Validate inputs
+        if (email == null || password == null) {
+            return ResponseEntity.badRequest().body("Email and password are required");
+        }
+
+        // Find user by email
         User user = userRepository.findByEmail(email).orElse(null);
+        
+        // Check if user exists and password matches
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
 
+        // Generate JWT token
         String token = jwtUtil.generateToken(email, user.getRole().name());
-        return ResponseEntity.ok(Map.of("token", token, "role", user.getRole().name()));
+        
+        // Create response with token and user info
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("user", Map.of(
+            "id", user.getId(),
+            "email", user.getEmail(),
+            "firstName", user.getFirstName(),
+            "lastName", user.getLastName(),
+            "role", user.getRole().name()
+        ));
+        
+        return ResponseEntity.ok(response);
     }
 }

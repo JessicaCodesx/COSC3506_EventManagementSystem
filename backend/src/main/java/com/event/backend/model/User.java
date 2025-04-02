@@ -1,6 +1,13 @@
 package com.event.backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
@@ -11,16 +18,29 @@ public class User {
     private Long id;
 
     private String firstName;
-
     private String lastName;
 
     @Column(unique = true)
     private String email;
 
     private String password;
+    
+    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    private UserRole role; // "ADMIN", "CLIENT", "VENDOR", etc.
+    private UserRole role;
+
+    // Constructors
+    public User() {
+    }
+
+    public User(String firstName, String lastName, String email, String password, UserRole role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
 
     // Getters and Setters
     public Long getId() {
@@ -70,9 +90,17 @@ public class User {
     public void setRole(UserRole role) {
         this.role = role;
     }
+    
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     public void setRole(String role) {
         this.role = UserRole.valueOf(role.toUpperCase());
     }
-
 }
+

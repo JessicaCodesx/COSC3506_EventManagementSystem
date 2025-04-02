@@ -1,17 +1,22 @@
 package com.event.backend.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
+
+import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
 
+    // Using a secure key generator instead of hard-coding a secret
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final long EXPIRATION_MS = 1000 * 60 * 60 * 24; // 24 hours
+    private final long EXPIRATION_MS = 86400000; // 24 hours
 
     public String generateToken(String email, String role) {
         return Jwts.builder()
@@ -34,10 +39,15 @@ public class JwtUtil {
     public boolean isValid(String token) {
         try {
             parseToken(token);
-            return true;
+            return !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private boolean isTokenExpired(String token) {
+        Date expiration = parseToken(token).getBody().getExpiration();
+        return expiration.before(new Date());
     }
 
     private Jws<Claims> parseToken(String token) {

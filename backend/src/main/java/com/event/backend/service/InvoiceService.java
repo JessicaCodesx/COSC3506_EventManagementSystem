@@ -1,58 +1,107 @@
 package com.event.backend.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.event.backend.exception.ResourceNotFoundException;
+import com.event.backend.model.Invoice;
+import com.event.backend.model.InvoiceStatus;
+import com.event.backend.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.event.backend.model.Invoice;
-import com.event.backend.repository.InvoiceRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class InvoiceService {
 
     @Autowired
-    private InvoiceRepository repository;
+    private InvoiceRepository invoiceRepository;
 
-    public Invoice create(Invoice invoice) {
-        return repository.save(invoice);
+    // Create a new invoice
+    public Invoice createInvoice(Invoice invoice) {
+        // Set default values if not provided
+        if (invoice.getCreatedAt() == null) {
+            invoice.setCreatedAt(LocalDateTime.now());
+        }
+        
+        if (invoice.getStatus() == null) {
+            invoice.setStatus(InvoiceStatus.DUE);
+        }
+        
+        return invoiceRepository.save(invoice);
     }
 
-    public Optional<Invoice> getById(Long id) {
-        return repository.findById(id);
+    // Get invoice by ID
+    public Invoice getInvoiceById(Long id) {
+        return invoiceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
     }
 
-    public List<Invoice> getByClientId(Long clientId) {
-        return repository.findByClientId(clientId);
+    // Get all invoices
+    public List<Invoice> getAllInvoices() {
+        return invoiceRepository.findAll();
     }
-
+    
+    // Get invoices by client ID
     public List<Invoice> getInvoicesByClientId(Long clientId) {
-        return repository.findByClientId(clientId);
+        return invoiceRepository.findByClientId(clientId);
+    }
+    
+    // Get invoices by event ID
+    public List<Invoice> getInvoicesByEventId(Long eventId) {
+        return invoiceRepository.findByEventId(eventId);
+    }
+    
+    // Get invoices by status
+    public List<Invoice> getInvoicesByStatus(InvoiceStatus status) {
+        return invoiceRepository.findByStatus(status);
+    }
+    
+    // Get invoices by client ID and status
+    public List<Invoice> getInvoicesByClientIdAndStatus(Long clientId, InvoiceStatus status) {
+        return invoiceRepository.findByClientIdAndStatus(clientId, status);
+    }
+    
+    // Get overdue invoices
+    public List<Invoice> getOverdueInvoices() {
+        return invoiceRepository.findByStatusAndDueDateBefore(InvoiceStatus.DUE, LocalDateTime.now());
     }
 
-    public List<Invoice> getInvoicesByClientIdAndStatus(Long clientId, Invoice.InvoiceStatus status) {
-        return repository.findByClientIdAndStatus(clientId, status);
+    // Update an invoice
+    public Invoice updateInvoice(Long id, Invoice updatedInvoice) {
+        return invoiceRepository.findById(id)
+                .map(invoice -> {
+                    if (updatedInvoice.getTotalAmount() != null) {
+                        invoice.setTotalAmount(updatedInvoice.getTotalAmount());
+                    }
+                    
+                    if (updatedInvoice.getStatus() != null) {
+                        invoice.setStatus(updatedInvoice.getStatus());
+                    }
+                    
+                    if (updatedInvoice.getDueDate() != null) {
+                        invoice.setDueDate(updatedInvoice.getDueDate());
+                    }
+                    
+                    return invoiceRepository.save(invoice);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
+    }
+    
+    // Update invoice status
+    public Invoice updateInvoiceStatus(Long id, InvoiceStatus status) {
+        return invoiceRepository.findById(id)
+                .map(invoice -> {
+                    invoice.setStatus(status);
+                    return invoiceRepository.save(invoice);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
     }
 
-    public List<Invoice> getByEventId(Long eventId) {
-        return repository.findByEventId(eventId);
-    }
-
-    public List<Invoice> getAll() {
-        return repository.findAll();
-    }
-
-    public Invoice update(Long id, Invoice invoiceDetails) {
-        return repository.findById(id).map(invoice -> {
-            invoice.setTotalAmount(invoiceDetails.getTotalAmount());
-            invoice.setStatus(invoiceDetails.getStatus());
-            invoice.setDueDate(invoiceDetails.getDueDate());
-            return repository.save(invoice);
-        }).orElse(null);
-    }
-
-    public void delete(Long id) {
-        repository.deleteById(id);
+    // Delete an invoice
+    public void deleteInvoice(Long id) {
+        if (!invoiceRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Invoice not found with id: " + id);
+        }
+        invoiceRepository.deleteById(id);
     }
 }

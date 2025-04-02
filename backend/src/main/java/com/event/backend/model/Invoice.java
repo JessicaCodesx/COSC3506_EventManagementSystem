@@ -1,7 +1,16 @@
 package com.event.backend.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "invoices")
@@ -11,16 +20,35 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double amount;
-
-    @Enumerated(EnumType.STRING)
-    private InvoiceStatus status; // Enum for invoice status (DUE, PAID, PROCESSING)
-
-    private LocalDateTime dueDate;
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private Event event;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
     private User client;
+
+    private Double totalAmount;
+
+    @Enumerated(EnumType.STRING)
+    private InvoiceStatus status;
+
+    private LocalDateTime dueDate;
+    private LocalDateTime createdAt;
+
+    // Constructors
+    public Invoice() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Invoice(Event event, User client, Double totalAmount, InvoiceStatus status, LocalDateTime dueDate) {
+        this.event = event;
+        this.client = client;
+        this.totalAmount = totalAmount;
+        this.status = status;
+        this.dueDate = dueDate;
+        this.createdAt = LocalDateTime.now();
+    }
 
     // Getters and Setters
     public Long getId() {
@@ -31,12 +59,28 @@ public class Invoice {
         this.id = id;
     }
 
-    public Double getAmount() {
-        return amount;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
+    public User getClient() {
+        return client;
+    }
+
+    public void setClient(User client) {
+        this.client = client;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public InvoiceStatus getStatus() {
@@ -55,17 +99,11 @@ public class Invoice {
         this.dueDate = dueDate;
     }
 
-    public User getClient() {
-        return client;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setClient(User client) {
-        this.client = client;
-    }
-
-    public enum InvoiceStatus {
-        DUE,
-        PAID,
-        PROCESSING
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

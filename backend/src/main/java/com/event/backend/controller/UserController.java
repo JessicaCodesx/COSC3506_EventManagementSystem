@@ -1,23 +1,15 @@
 package com.event.backend.controller;
 
-import java.util.List;
-
+import com.event.backend.model.User;
+import com.event.backend.model.UserRole;
+import com.event.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.event.backend.model.User;
-import com.event.backend.service.UserService;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -27,23 +19,26 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return ResponseEntity.ok(userService.createUser(user));
-    }
-
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
         return ResponseEntity.ok(userService.createUser(user));
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
         return userService.getAllUsers();
+    }
+    
+    @GetMapping("/role/{role}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<User> getUsersByRole(@PathVariable String role) {
+        try {
+            UserRole userRole = UserRole.valueOf(role.toUpperCase());
+            return userService.getUsersByRole(userRole);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid role: " + role);
+        }
     }
 
     @GetMapping("/{id}")
@@ -55,21 +50,25 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User updated = userService.updateUser(id, user);
-        if (updated != null)
+        try {
+            User updated = userService.updateUser(id, user);
             return ResponseEntity.ok(updated);
-        return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
     }
 
-    @GetMapping("/admin-only")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String adminOnlyTest() {
-        return "Admin access confirmed!";
+    @GetMapping("/profile")
+    public ResponseEntity<?> getCurrentUserProfile(@RequestHeader("Authorization") String token) {
+        // This would normally extract the user from the token and return the profile
+        // For simplicity, we'll assume this is handled elsewhere
+        return ResponseEntity.ok().build();
     }
 }

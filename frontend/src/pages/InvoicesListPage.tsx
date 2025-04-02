@@ -196,17 +196,6 @@ const InvoicesListPage: React.FC = () => {
                           >
                             <VisibilityIcon />
                           </Link>
-                          {(role === "ADMIN" ||
-                            (role === "CLIENT" &&
-                              invoice.status === "PENDING")) && (
-                            <Link
-                              to={`/invoices/${invoice.id}/edit`}
-                              className="action-button"
-                              title="Edit"
-                            >
-                              <EditIcon />
-                            </Link>
-                          )}
                           {role === "CLIENT" &&
                             invoice.status === "PENDING" && (
                               <Link

@@ -163,7 +163,7 @@ const MOCK_PAYMENTS = [
   },
 
   {
-    id: 102,
+    id: 103,
     eventId: 2,
     eventName: "Mixer",
     amountPaid: 20000.0,
@@ -178,7 +178,7 @@ const MOCK_PAYMENTS = [
   },
 
   {
-    id: 102,
+    id: 104,
     eventId: 2,
     eventName: "TedTalk",
     amountPaid: 532.0,
@@ -593,6 +593,20 @@ export const MockAssignmentService = {
     
     MOCK_ASSIGNMENTS.splice(index, 1);
     
+    return { success: true };
+  }, 
+
+  setAssignmentStatus: async (id: number, status: string) => {
+    await delay(50);
+
+    const index = MOCK_ASSIGNMENTS.findIndex(x => x.id === id);
+
+    if (index === -1) {
+      throw new Error('Assignment not found');
+    }
+
+    MOCK_ASSIGNMENTS[index].status = status;
+
     return { success: true };
   }
 };

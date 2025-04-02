@@ -112,6 +112,26 @@ const AssignmentsPage: React.FC = () => {
     }
   };
 
+  const changeAssignment = (assignmentID: number) => {
+    let assignmentIndex = assignments.findIndex((x) => x.id === assignmentID);
+    let temp = [...assignments];
+    if (assignmentIndex != -1) {
+      if (temp[assignmentIndex].status === "ASSIGNED") {
+        temp[assignmentIndex].status = "AVAILABLE";
+      } else if (temp[assignmentIndex].status === "AVAILABLE") {
+        temp[assignmentIndex].status = "ASSIGNED";
+      } else {
+        temp[assignmentIndex].status = "";
+      }
+      AssignmentService.setAssignmentStatus(
+        temp[assignmentIndex].id,
+        temp[assignmentIndex].status
+      );
+
+      setAssignments(temp);
+    }
+  };
+
   return (
     <div className="dashboard-page">
       <Sidebar userRole={role} />
@@ -200,13 +220,12 @@ const AssignmentsPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="actions-cell">
-                          <Link
-                            to={`/events/${assignment.id}/edit`}
+                          <a
                             className="action-button"
-                            title="Edit"
+                            onClick={() => changeAssignment(assignment.id)}
                           >
                             <CheckIcon />
-                          </Link>
+                          </a>
                         </td>
                       </tr>
                     ))}

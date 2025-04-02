@@ -161,6 +161,37 @@ const VendorDashboard: React.FC = () => {
     }
   };
 
+  const setStatusClass = (status: string) => {
+    switch (status) {
+      case "ASSIGNED":
+        return "status-available";
+      case "AVAILABLE":
+        return "status-assigned";
+      default:
+        return "";
+    }
+  };
+
+  const changeAssignment = (assignmentID: number) => {
+    let assignmentIndex = assignments.findIndex((x) => x.id === assignmentID);
+    let temp = [...assignments];
+    if (assignmentIndex != -1) {
+      if (temp[assignmentIndex].status === "ASSIGNED") {
+        temp[assignmentIndex].status = "AVAILABLE";
+      } else if (temp[assignmentIndex].status === "AVAILABLE") {
+        temp[assignmentIndex].status = "ASSIGNED";
+      } else {
+        temp[assignmentIndex].status = "";
+      }
+      AssignmentService.setAssignmentStatus(
+        temp[assignmentIndex].id,
+        temp[assignmentIndex].status
+      );
+
+      setAssignments(temp);
+    }
+  };
+
   // Calculate upcoming assignments (next 7 days)
   const upcomingAssignments = assignments.filter((assignment) => {
     const eventDate = new Date(getEventDate(assignment.event.id, false));
@@ -261,12 +292,12 @@ const VendorDashboard: React.FC = () => {
                         </span>
                       </td>
                       <td>
-                        <Link
-                          to={`/assignments/${assignment.id}`}
+                        <a
                           className="action-button"
+                          onClick={() => changeAssignment(assignment.id)}
                         >
                           <CheckIcon />
-                        </Link>
+                        </a>
                       </td>
                     </tr>
                   ))}

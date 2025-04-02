@@ -182,7 +182,7 @@ const InvoiceDetailsPage: React.FC = () => {
                     </span>
                   </div>
                   <div className="detail-actions">
-                    {canEdit() && (
+                    {canEdit() && user && user.role !== "CLIENT" && (
                       <Link
                         to={`/invoices/${invoiceId}/edit`}
                         className="btn btn-secondary"

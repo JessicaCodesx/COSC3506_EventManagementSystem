@@ -175,13 +175,15 @@ const EventsListPage: React.FC<PropComplete> = ({ status }) => {
                           </span>
                         </td>
                         <td className="actions-cell">
-                          <Link
-                            to={`/events/${event.id}`}
-                            className="action-button"
-                            title="Review"
-                          >
-                            <StarIcon />
-                          </Link>
+                          {event.status === "COMPLETED" && (
+                            <Link
+                              to={`/events/${event.id}`}
+                              className="action-button"
+                              title="Review"
+                            >
+                              <StarIcon />
+                            </Link>
+                          )}
                           <Link
                             to={`/events/${event.id}`}
                             className="action-button"

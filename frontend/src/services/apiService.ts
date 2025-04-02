@@ -255,6 +255,10 @@ export const AssignmentService = {
 
     const response = await api.delete(`/assignments/${id}`);
     return response.data;
+  },
+
+  setAssignmentStatus: async (id: number, status: string) => {
+    MockAssignmentService.setAssignmentStatus(id, status);
   }
 };
 

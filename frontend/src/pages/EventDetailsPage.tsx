@@ -117,7 +117,7 @@ const EventDetailsPage: React.FC = () => {
   };
 
   const canEdit = () => {
-    if (event.status === "COMPLETED") return false;
+    if (event && event.status === "COMPLETED") return false;
     if (role === "ADMIN") return true;
     if (role === "CLIENT" && event?.client?.id === user?.id) return true;
     return false;

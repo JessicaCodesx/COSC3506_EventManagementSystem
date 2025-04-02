@@ -263,12 +263,6 @@ const AdminDashboard: React.FC = () => {
                       </td>
                       <td>
                         <Link
-                          to={`/users/${user.id}`}
-                          className="action-button"
-                        >
-                          <VisibilityIcon />
-                        </Link>
-                        <Link
                           to={`/users/${user.id}/edit`}
                           className="action-button"
                         >

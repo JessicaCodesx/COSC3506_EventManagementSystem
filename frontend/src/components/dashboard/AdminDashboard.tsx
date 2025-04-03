@@ -214,6 +214,24 @@ const AdminDashboard: React.FC = () => {
                         >
                           <EditIcon />
                         </Link>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm('Are you sure you want to delete this event?')) {
+                              try {
+                                await EventService.deleteEvent(event.id);
+                                // Refresh the events list
+                                const updatedEvents = await EventService.getAllEvents();
+                                setEvents(updatedEvents);
+                              } catch (err) {
+                                setError('Failed to delete event');
+                                console.error('Error deleting event:', err);
+                              }
+                            }
+                          }}
+                          className="action-button"
+                        >
+                          <DeleteIcon />
+                        </button>
                       </td>
                     </tr>
                   ))}

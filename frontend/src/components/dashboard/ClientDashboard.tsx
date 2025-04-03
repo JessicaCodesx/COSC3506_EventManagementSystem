@@ -6,9 +6,13 @@ import {
   EventService,
   InvoiceService,
   UserService,
+  TaskService,
+  ScheduleService,
   Event as ApiEvent,
   Invoice as ApiInvoice,
   User as ApiUser,
+  Task as ApiTask,
+  Schedule as ApiSchedule,
 } from "../../services/apiService";
 
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -57,6 +61,26 @@ interface User extends ApiUser {
   }[];
 }
 
+interface Task extends ApiTask {
+  id: number;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: 'TODO' | 'IN_PROGRESS' | 'COMPLETED';
+  assignedTo: number;
+  eventId?: number;
+}
+
+interface Schedule extends ApiSchedule {
+  id: number;
+  userId: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+  eventId?: number;
+  description?: string;
+}
+
 const ClientDashboard: React.FC = () => {
   const [loading] = useState<boolean>(false);
 
@@ -66,6 +90,8 @@ const ClientDashboard: React.FC = () => {
   const [vendors, setVendors] = useState<User[]>([]);
   const [staff, setStaff] = useState<User[]>([]);
   const [error, setError] = useState<string>("");
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -117,8 +143,32 @@ const ClientDashboard: React.FC = () => {
       }
     };
 
+    const fetchTasks = async () => {
+      try {
+        if (user?.id) {
+          const taskData = await TaskService.getTasksByUserId(user.id);
+          setTasks(taskData);
+        }
+      } catch (err: unknown) {
+        setError('Failed to fetch tasks');
+      }
+    };
+
+    const fetchSchedules = async () => {
+      try {
+        if (user?.id) {
+          const scheduleData = await ScheduleService.getScheduleByUserId(user.id);
+          setSchedules(scheduleData);
+        }
+      } catch (err: unknown) {
+        setError('Failed to fetch schedules');
+      }
+    };
+
     fetchInvoice();
     fetchUsers();
+    fetchTasks();
+    fetchSchedules();
   }, [role, user?.id]);
 
   const formatDate = (dateString: string) => {
@@ -133,21 +183,43 @@ const ClientDashboard: React.FC = () => {
   };
 
   const getStatusClass = (status: string) => {
-    switch (status) {
-      case "SCHEDULED":
-        return "status-scheduled";
+    switch (status.toUpperCase()) {
+      case "PENDING":
+        return "status-pending";
       case "COMPLETED":
         return "status-completed";
-      case "CANCELED":
-        return "status-canceled";
-      case "PAID":
-        return "status-completed";
-      case "PENDING":
-        return "status-scheduled";
+      case "CANCELLED":
+        return "status-cancelled";
+      case "IN_PROGRESS":
+        return "status-in-progress";
       case "OVERDUE":
-        return "status-canceled";
+        return "status-overdue";
+      case "PAID":
+        return "status-paid";
+      case "UNPAID":
+        return "status-unpaid";
+      case "TODO":
+        return "status-todo";
       default:
         return "";
+    }
+  };
+
+  const handleDeleteSchedule = async (id: number) => {
+    try {
+      await ScheduleService.deleteSchedule(id);
+      setSchedules(schedules.filter(schedule => schedule.id !== id));
+    } catch (err: unknown) {
+      setError('Failed to delete schedule');
+    }
+  };
+
+  const handleDeleteTask = async (id: number) => {
+    try {
+      await TaskService.deleteTask(id);
+      setTasks(tasks.filter(task => task.id !== id));
+    } catch (err: unknown) {
+      setError('Failed to delete task');
     }
   };
 
@@ -471,16 +543,142 @@ const ClientDashboard: React.FC = () => {
       </div>
 
       {error && <div className="error-message">{error}</div>}
+      {role === 'STAFF' && (
+        <div className="dashboard-section">
+          <div className="widget tasks-widget">
+            <div className="widget-header">
+              <h2>My Tasks</h2>
+              <Link to="/tasks/create" className="add-new-link">
+                <AddCircleOutlineIcon /> Add New Task
+              </Link>
+            </div>
+            <div className="widget-content">
+              {tasks.length > 0 ? (
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Due Date</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tasks.map((task) => (
+                      <tr key={task.id}>
+                        <td>{task.title}</td>
+                        <td>{formatDate(task.dueDate)}</td>
+                        <td>
+                          <span className={`status-badge ${getStatusClass(task.status)}`}>
+                            {task.status}
+                          </span>
+                        </td>
+                        <td>
+                          <Link to={`/tasks/${task.id}/edit`} className="action-button">
+                            <EditIcon />
+                          </Link>
+                          <button
+                            onClick={() => handleDeleteTask(task.id)}
+                            className="action-button delete"
+                          >
+                            <DeleteIcon />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="empty-state">
+                  <p>No tasks assigned</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="widget schedule-widget">
+            <div className="widget-header">
+              <h2>My Schedule</h2>
+              <Link to="/schedule/create" className="add-new-link">
+                <AddCircleOutlineIcon /> Add Schedule
+              </Link>
+            </div>
+            <div className="widget-content">
+              {schedules.length > 0 ? (
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Description</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {schedules.map((schedule) => (
+                      <tr key={schedule.id}>
+                        <td>{formatDate(schedule.date)}</td>
+                        <td>{schedule.startTime} - {schedule.endTime}</td>
+                        <td>{schedule.description || 'N/A'}</td>
+                        <td>
+                          <Link to={`/schedule/${schedule.id}/edit`} className="action-button">
+                            <EditIcon />
+                          </Link>
+                          <button
+                            onClick={() => handleDeleteSchedule(schedule.id)}
+                            className="action-button delete"
+                          >
+                            <DeleteIcon />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="empty-state">
+                  <p>No schedules found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="dashboard-actions">
-        <Link to="/events/create" className="action-card">
-          <div className="action-icon">
-            <AddCircleOutlineIcon />
-          </div>
-          <div className="action-details">
-            <h3>Create New Event</h3>
-            <p>Plan your next event with our guided setup</p>
-          </div>
-        </Link>
+        {role !== 'STAFF' && (
+          <>
+            <Link to="/events/create" className="action-card">
+              <div className="action-icon">
+                <AddCircleOutlineIcon />
+              </div>
+              <div className="action-details">
+                <h3>Create New Event</h3>
+                <p>Plan your next event with our guided setup</p>
+              </div>
+            </Link>
+
+            <Link to="/events/completed" className="action-card">
+              <div className="action-icon">
+                <StarIcon />
+              </div>
+              <div className="action-details">
+                <h3>Complete Event Reviews</h3>
+                <p>Provide a review for completed events</p>
+              </div>
+            </Link>
+
+            <Link to="/invoices" className="action-card">
+              <div className="action-icon">
+                <MoneyIcon />
+              </div>
+              <div className="action-details">
+                <h3>View Invoices</h3>
+                <p>View Completed and Pending Invoices</p>
+              </div>
+            </Link>
+          </>
+        )}
 
         <Link to="/profile" className="action-card">
           <div className="action-icon">
@@ -492,25 +690,29 @@ const ClientDashboard: React.FC = () => {
           </div>
         </Link>
 
-        <Link to="/events/completed" className="action-card">
-          <div className="action-icon">
-            <StarIcon />
-          </div>
-          <div className="action-details">
-            <h3>Complete Event Reviews</h3>
-            <p>Provide a review for completed events</p>
-          </div>
-        </Link>
+        {role === 'STAFF' && (
+          <>
+            <Link to="/tasks" className="action-card">
+              <div className="action-icon">
+                <EditCalendarIcon />
+              </div>
+              <div className="action-details">
+                <h3>Manage Tasks</h3>
+                <p>View and manage your assigned tasks</p>
+              </div>
+            </Link>
 
-        <Link to="/invoices" className="action-card">
-          <div className="action-icon">
-            <MoneyIcon />
-          </div>
-          <div className="action-details">
-            <h3>View Invoices</h3>
-            <p>View Completed and Pending Invoices</p>
-          </div>
-        </Link>
+            <Link to="/schedule" className="action-card">
+              <div className="action-icon">
+                <CalendarMonthIcon />
+              </div>
+              <div className="action-details">
+                <h3>View Schedule</h3>
+                <p>Manage your work schedule</p>
+              </div>
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

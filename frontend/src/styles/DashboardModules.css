@@ -179,6 +179,49 @@
 }
 
 /* Status Badges */
+.tasks-widget,
+.schedule-widget {
+  margin-bottom: 2rem;
+}
+
+.tasks-widget .widget-header,
+.schedule-widget .widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.add-new-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.add-new-link:hover {
+  color: var(--primary-dark);
+}
+
+.action-button.delete {
+  color: var(--error-color);
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.action-button.delete:hover {
+  color: var(--error-dark);
+}
+
+.status-todo {
+  background-color: var(--gray-light);
+  color: var(--gray-dark);
+}
+
 .status-badge {
   padding: 6px 12px;
   border-radius: 30px;

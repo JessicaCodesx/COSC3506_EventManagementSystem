@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MockAuthService, MockInvoiceService, MockUserService, MockEventService, MockAssignmentService, MockPaymentService, MockVendorAvailabilityService } from './mockApiService';
+import { MockAuthService, MockInvoiceService, MockUserService as MockUserServiceImpl, MockEventService, MockAssignmentService, MockPaymentService, MockVendorAvailabilityService } from './mockApiService';
 
 const useMockServices = true;
 
@@ -149,12 +149,21 @@ interface UserServiceInterface {
   updateProfile(id: number, userData: Partial<User>): Promise<User>;
 }
 
+interface MockUserServiceInterface extends UserServiceInterface {
+  getUserById(id: number): Promise<User>;
+}
+
 const mockUsers: User[] = [
   { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', role: 'admin' },
   { id: 2, firstName: 'Jane', lastName: 'Doe', email: 'jane.doe@example.com', role: 'user' },
 ];
 
-export const MockUserService = {
+export const MockUserService: MockUserServiceInterface = {
+  getUserById: async (id: number): Promise<User> => {
+    const user = mockUsers.find(user => user.id === id);
+    if (!user) throw new Error('User not found');
+    return user;
+  },
   getCurrentUser: async (email: string): Promise<User> => {
     const mockUser = mockUsers.find(user => user.email === email);
     return mockUser || {} as User;
@@ -188,7 +197,7 @@ export const MockUserService = {
 export const UserService: UserServiceInterface = {
   getCurrentUser: async (email: string) => {
     if(useMockServices)
-      return MockUserService.getCurrentUser(email);
+      return MockUserServiceImpl.getCurrentUser(email);
     try {
       const response = await api.get(`/users/email/${email}`);
       return response.data;
@@ -198,28 +207,95 @@ export const UserService: UserServiceInterface = {
   },
   createUser: async (userData: Partial<User>) => {
     if(useMockServices)
-      return MockUserService.createUser(userData);
+      return MockUserServiceImpl.createUser(userData);
     const response = await api.post("/users", userData);
     return response.data;
   },
   getAllUsers: async () => {
     if(useMockServices)
-      return MockUserService.getAllUsers();
+      return MockUserServiceImpl.getAllUsers();
 
     const response = await api.get("/users");
     return response.data;
   },
   deleteUser: async (id: number) => {
     if(useMockServices)
-      return MockUserService.deleteUser(id);
+      return MockUserServiceImpl.deleteUser(id);
     await api.delete(`/users/${id}`);
   },
   updateProfile: async (id: number, userData: Partial<User>) => {
     if(useMockServices)
-      return MockUserService.updateProfile(id, userData);
+      return MockUserServiceImpl.updateProfile(id, userData);
     const response = await api.put(`/users/${id}`, userData);
     return response.data;
   },
+};
+
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: 'TODO' | 'IN_PROGRESS' | 'COMPLETED';
+  assignedTo: number;
+  eventId?: number;
+}
+
+export const TaskService = {
+  getAllTasks: async (): Promise<Task[]> => {
+    const response = await api.get('/tasks');
+    return response.data;
+  },
+
+  getTasksByUserId: async (userId: number): Promise<Task[]> => {
+    const response = await api.get(`/tasks/user/${userId}`);
+    return response.data;
+  },
+
+  createTask: async (task: Partial<Task>): Promise<Task> => {
+    const response = await api.post('/tasks', task);
+    return response.data;
+  },
+
+  updateTask: async (id: number, task: Partial<Task>): Promise<Task> => {
+    const response = await api.put(`/tasks/${id}`, task);
+    return response.data;
+  },
+
+  deleteTask: async (id: number): Promise<void> => {
+    await api.delete(`/tasks/${id}`);
+  }
+};
+
+export interface Schedule {
+  id: number;
+  userId: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+  eventId?: number;
+  description?: string;
+}
+
+export const ScheduleService = {
+  getScheduleByUserId: async (userId: number): Promise<Schedule[]> => {
+    const response = await api.get(`/schedules/user/${userId}`);
+    return response.data;
+  },
+
+  createSchedule: async (schedule: Partial<Schedule>): Promise<Schedule> => {
+    const response = await api.post('/schedules', schedule);
+    return response.data;
+  },
+
+  updateSchedule: async (id: number, schedule: Partial<Schedule>): Promise<Schedule> => {
+    const response = await api.put(`/schedules/${id}`, schedule);
+    return response.data;
+  },
+
+  deleteSchedule: async (id: number): Promise<void> => {
+    await api.delete(`/schedules/${id}`);
+  }
 };
 
 export const VendorAvailabilityService = {

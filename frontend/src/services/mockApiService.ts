@@ -324,83 +324,71 @@ export const MockAuthService = {
   }
 };
 
-export const MockUserService = {
+export interface MockUserServiceInterface {
+  getUserById(id: number): Promise<any>;
+
+  getCurrentUser(email: string): Promise<any>;
+  createUser(userData: any): Promise<any>;
+  getAllUsers(): Promise<any[]>;
+  deleteUser(id: number): Promise<void>;
+  updateProfile(id: number, userData: any): Promise<any>;
+}
+
+export const MockUserService: MockUserServiceInterface = {
   getCurrentUser: async (email: any) => {
     await delay(150);
     
-    const index = MOCK_USERS.findIndex(u => u.email === email);
-    
-    return index == -1 ? {} : {
-      id: MOCK_USERS[index].id,
-      firstName: MOCK_USERS[index].firstName,
-      lastName: MOCK_USERS[index].lastName,
-      email: MOCK_USERS[index].email,
-      role: MOCK_USERS[index].role,
-      availability: MOCK_USERS[index].availability
-    };
+    const mockUser = MOCK_USERS.find(user => user.email === email);
+    return mockUser || {};
   },
 
   createUser: async (userData: any) => {
     await delay(150);
-    
+
     const newUser = {
       id: MOCK_USERS.length + 1,
       ...userData
     };
-    
     MOCK_USERS.push(newUser);
-    
     return newUser;
   },
-  
-  updateProfile: async (userData: any) => {
+
+  updateProfile: async (id: number, userData: any) => {
     await delay(150);
-    
-    const userIndex = MOCK_USERS.findIndex(u => u.id === userData.id);
-    
-    if (userIndex === -1) {
-      throw new Error('User not found');
+
+    const userIndex = MOCK_USERS.findIndex(user => user.id === id);
+    if (userIndex !== -1) {
+      MOCK_USERS[userIndex] = { ...MOCK_USERS[userIndex], ...userData };
+      return MOCK_USERS[userIndex];
     }
-    
-    MOCK_USERS[userIndex] = {
-      ...MOCK_USERS[userIndex],
-      ...userData
-    };
-    
-    return MOCK_USERS[userIndex];
+    throw new Error('User not found');
   },
-  
+
   getAllUsers: async () => {
     await delay(150);
-    
-    return MOCK_USERS.map(u => ({
-      id: u.id,
-      firstName: u.firstName,
-      lastName: u.lastName,
-      email: u.email,
-      role: u.role
-    }));
+    return MOCK_USERS;
   },
-  
+
   getUserById: async (id: number) => {
     await delay(100);
     
-    const user = MOCK_USERS.find(u => u.id === id);
+    const user = MOCK_USERS.find(user => user.id === id);
     
     if (!user) {
       throw new Error('User not found');
     }
     
-    return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role
-    };
-  }
+    return user;
+  },
 
-  
+  deleteUser: async (id: number) => {
+    await delay(150);
+    const userIndex = MOCK_USERS.findIndex(user => user.id === id);
+    if (userIndex === -1) {
+      throw new Error('User not found');
+    }
+    MOCK_USERS.splice(userIndex, 1);
+  },
 };
 
 export const MockVendorAvailabilityService = {

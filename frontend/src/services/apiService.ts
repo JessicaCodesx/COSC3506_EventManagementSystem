@@ -167,6 +167,14 @@ export const UserService = {
 
     const response = await api.get(`/users/${id}`);
     return response.data;
+  },
+
+  deleteUser: async (id: number) => {
+    if(useMockServices)
+      return MockUserService.deleteUser(id);
+
+    const response = await api.delete(`/users/${id}`);
+    return response.data;
   }
 };
 

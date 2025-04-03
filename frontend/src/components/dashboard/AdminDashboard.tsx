@@ -20,6 +20,7 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import PriceChangeIcon from "@mui/icons-material/PriceChange";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const AdminDashboard: React.FC = () => {
   const { user, role } = useAuth();
@@ -27,6 +28,7 @@ const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -237,6 +239,8 @@ const AdminDashboard: React.FC = () => {
           <div className="widget-content">
             {loading ? (
               <div className="loading-spinner">Loading...</div>
+            ) : error ? (
+              <div className="error-message">{error}</div>
             ) : users.length > 0 ? (
               <table className="data-table">
                 <thead>
@@ -268,6 +272,24 @@ const AdminDashboard: React.FC = () => {
                         >
                           <EditIcon />
                         </Link>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm('Are you sure you want to delete this user?')) {
+                              try {
+                                await UserService.deleteUser(user.id);
+                                // Refresh the users list
+                                const updatedUsers = await UserService.getAllUsers();
+                                setUsers(updatedUsers);
+                              } catch (err) {
+                                setError('Failed to delete user');
+                                console.error('Error deleting user:', err);
+                              }
+                            }
+                          }}
+                          className="action-button"
+                        >
+                          <DeleteIcon />
+                        </button>
                       </td>
                     </tr>
                   ))}

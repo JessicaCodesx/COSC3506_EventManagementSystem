@@ -127,13 +127,20 @@ You can use the following pre-configured accounts to test different user roles:
 2. Test the following features:
    - View events you're assigned to
    - Update your profile
-   - View schedules
+   - View and manage schedules
+   - Create and manage tasks
+   - Access dashboard with task management
 
 ### Important Testing Notes
 
 - **Payment Processing**: The system simulates payment processing. When you "pay" an invoice, it simply updates the status to "PAID".
 - **Email Notifications**: Email notifications are simulated and not actually sent.
 - **Data Persistence**: All data is stored in the local MySQL database, so changes will persist between sessions.
+- **UI Features**: 
+  - Modern, responsive design with smooth animations
+  - Enhanced logout experience with confirmation modal
+  - Task management interface for staff users
+  - Improved navigation with clear visual feedback
 
 ---
 
@@ -144,6 +151,8 @@ Frontend:
 - TypeScript
 - React Router
 - Context API for state management
+- Font Awesome icons for enhanced UI
+- CSS animations and transitions
 
 Backend:
 - Java 17

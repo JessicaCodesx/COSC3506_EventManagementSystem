@@ -1,21 +1,15 @@
 # Event Management System (EMS)
-
 A full-stack web application for creating, managing, and tracking events — built with React 18 + Vite on the frontend and Spring Boot on the backend.
 
 ---
-
 ## Project Structure
-
 event-management-system/
 ├── frontend/    → React 18 + Vite  
 └── backend/     → Spring Boot + Java 17 + Spring Security + JPA
-
 ---
-
 ## How to Run
 
 ### Prerequisites
-
 Make sure you have the following installed:
 
 - Node.js (v18+): https://nodejs.org/
@@ -32,11 +26,9 @@ Make sure you have the following installed:
    ```bash
    git clone https://github.com/JessicaCodesx/COSC3506_EventManagementSystem.git
    ```
-
 ---
 
 ### MySQL Database Setup (Required)
-
 Before running the backend, set up the local database:
 
 1. Open a terminal 
@@ -54,9 +46,7 @@ FLUSH PRIVILEGES;
 3. Make sure MySQL is running on localhost:3306
 
 ---
-
 ### Backend Setup (Spring Boot)
-
 1. Open the root `event-management-system` folder in IntelliJ or your preferred IDE
 2. Navigate to: `src/main/java/com/event/backend/BackendApplication.java`
 3. Right-click the file and choose Run 'BackendApplication'
@@ -71,7 +61,6 @@ mvn spring-boot:run
 ---
 
 ### Frontend Setup (React + Vite)
-
 ```bash
 cd frontend  
 npm install            # Install dependencies  
@@ -79,13 +68,10 @@ npm run dev            # Run the dev server (http://localhost:5173)
 ```
 
 > The frontend will run on http://localhost:5173 by default.
-
 ---
 
 ## Testing the Application
-
 ### Login Credentials
-
 You can use the following pre-configured accounts to test different user roles:
 
 | Role  | Email             | Password  | Description                               |
@@ -96,7 +82,6 @@ You can use the following pre-configured accounts to test different user roles:
 | Staff | staff@example.com | Staff123  | Can view and assist with assigned events  |
 
 ### Testing Flow for Different Roles
-
 #### Admin User
 1. Log in as admin@example.com / Admin123
 2. You'll have access to:
@@ -131,21 +116,7 @@ You can use the following pre-configured accounts to test different user roles:
    - Create and manage tasks
    - Access dashboard with task management
 
-### Important Testing Notes
-
-- **Payment Processing**: The system simulates payment processing. When you "pay" an invoice, it simply updates the status to "PAID".
-- **Email Notifications**: Email notifications are simulated and not actually sent.
-- **Data Persistence**: All data is stored in the local MySQL database, so changes will persist between sessions.
-- **UI Features**: 
-  - Modern, responsive design with smooth animations
-  - Enhanced logout experience with confirmation modal
-  - Task management interface for staff users
-  - Improved navigation with clear visual feedback
-
----
-
-## 🛠 Tech Stack
-
+## Tech Stack
 Frontend:
 - React 18 (via Vite)
 - TypeScript
@@ -168,4 +139,3 @@ Backend:
 
 - **Backend won't start**: Make sure MySQL is running and the database and user credentials are set up correctly.
 - **Frontend can't connect to backend**: Check that backend is running on port 8080 and that there are no CORS issues.
-- **Login fails**: Verify that the backend is properly seeding the initial users. Check console for any error messages.

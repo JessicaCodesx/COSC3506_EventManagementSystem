@@ -94,10 +94,24 @@
   
   .btn-logout {
     background-color: #ff4a4a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
   }
   
   .btn-logout:hover {
     background-color: #e03a3a;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 74, 74, 0.3);
+  }
+
+  .btn-logout i {
+    font-size: 1rem;
+  }
+
+  .btn-logout span {
+    font-weight: 600;
   }
   
   /* Media Queries */

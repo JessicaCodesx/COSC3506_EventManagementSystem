@@ -128,54 +128,98 @@ export const AuthService = {
   }
 };
 
-export const UserService = {
-  getCurrentUser: async (email: any) => {
+export interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  availability?: {
+    id: number;
+    date: string;
+    isAvailable: boolean;
+  }[];
+}
+
+interface UserServiceInterface {
+  getCurrentUser(email: string): Promise<User>;
+  createUser(userData: Partial<User>): Promise<User>;
+  getAllUsers(): Promise<User[]>;
+  deleteUser(id: number): Promise<void>;
+  updateProfile(id: number, userData: Partial<User>): Promise<User>;
+}
+
+const mockUsers: User[] = [
+  { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', role: 'admin' },
+  { id: 2, firstName: 'Jane', lastName: 'Doe', email: 'jane.doe@example.com', role: 'user' },
+];
+
+export const MockUserService = {
+  getCurrentUser: async (email: string): Promise<User> => {
+    const mockUser = mockUsers.find(user => user.email === email);
+    return mockUser || {} as User;
+  },
+  createUser: async (userData: Partial<User>): Promise<User> => {
+    const newUser = {
+      id: mockUsers.length + 1,
+      ...userData
+    } as User;
+    mockUsers.push(newUser);
+    return newUser;
+  },
+  updateProfile: async (id: number, userData: Partial<User>): Promise<User> => {
+    const userIndex = mockUsers.findIndex(user => user.id === id);
+    if (userIndex !== -1) {
+      mockUsers[userIndex] = { ...mockUsers[userIndex], ...userData };
+      return mockUsers[userIndex];
+    }
+    throw new Error('User not found');
+  },
+  getAllUsers: async (): Promise<User[]> => {
+    return mockUsers;
+  },
+  deleteUser: async (id: number): Promise<void> => {
+    const userIndex = mockUsers.findIndex(user => user.id === id);
+    if (userIndex === -1) throw new Error('User not found');
+    mockUsers.splice(userIndex, 1);
+  }
+};
+
+export const UserService: UserServiceInterface = {
+  getCurrentUser: async (email: string) => {
     if(useMockServices)
       return MockUserService.getCurrentUser(email);
-
-    const response = await api.get('/users/current');
-    return response.data;
+    try {
+      const response = await api.get(`/users/email/${email}`);
+      return response.data;
+    } catch (error) {
+      return {} as User;
+    }
   },
-
-  createUser: async (userData: any) => {
+  createUser: async (userData: Partial<User>) => {
     if(useMockServices)
       return MockUserService.createUser(userData);
-
-    const response = await api.post('/users', userData);
+    const response = await api.post("/users", userData);
     return response.data;
   },
-  
-  updateProfile: async (userData: any) => {
-    if(useMockServices)
-      return MockUserService.updateProfile(userData);
-    
-    const response = await api.put('/users/profile', userData);
-    return response.data;
-  },
-  
   getAllUsers: async () => {
     if(useMockServices)
       return MockUserService.getAllUsers();
 
-    const response = await api.get('/users');
+    const response = await api.get("/users");
     return response.data;
   },
-  
-  getUserById: async (id: number) => {
-    if(useMockServices)
-      return MockUserService.getUserById(id);
-
-    const response = await api.get(`/users/${id}`);
-    return response.data;
-  },
-
   deleteUser: async (id: number) => {
     if(useMockServices)
       return MockUserService.deleteUser(id);
-
-    const response = await api.delete(`/users/${id}`);
+    await api.delete(`/users/${id}`);
+  },
+  updateProfile: async (id: number, userData: Partial<User>) => {
+    if(useMockServices)
+      return MockUserService.updateProfile(id, userData);
+    const response = await api.put(`/users/${id}`, userData);
     return response.data;
-  }
+  },
 };
 
 export const VendorAvailabilityService = {

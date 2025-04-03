@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import "../../styles/DashboardModules.css";
 import { useAuth } from "../../contexts/AuthContext";
 import {
-  User,
-  Event,
-  Invoice,
   EventService,
-  UserService,
   InvoiceService,
+  UserService,
+  Event as ApiEvent,
+  Invoice as ApiInvoice,
+  User as ApiUser,
 } from "../../services/apiService";
 
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -23,13 +23,49 @@ import StoreIcon from "@mui/icons-material/Store";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import StarIcon from "@mui/icons-material/Star";
 import MoneyIcon from "@mui/icons-material/CreditCard";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+interface Event extends ApiEvent {
+  id: number;
+  name: string;
+  date: string;
+  status: string;
+  description: string;
+  location: string;
+  clientId: number;
+}
+
+interface Invoice extends ApiInvoice {
+  id: number;
+  amount: number;
+  status: string;
+  dueDate: string;
+  eventId: number;
+}
+
+interface User extends ApiUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  availability?: {
+    id: number;
+    date: string;
+    isAvailable: boolean;
+  }[];
+}
 
 const ClientDashboard: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState<boolean>(false);
 
   const { user, role } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [vendors, setVendors] = useState<User[]>([]);
+  const [staff, setStaff] = useState<User[]>([]);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -71,7 +107,18 @@ const ClientDashboard: React.FC = () => {
       } catch (err: any) {}
     };
 
+    const fetchUsers = async () => {
+      try {
+        const users = await UserService.getAllUsers();
+        setVendors(users.filter((user: User) => user.role === "VENDOR"));
+        setStaff(users.filter((user: User) => user.role === "STAFF"));
+      } catch (err: unknown) {
+        setError('Failed to fetch users');
+      }
+    };
+
     fetchInvoice();
+    fetchUsers();
   }, [role, user?.id]);
 
   const formatDate = (dateString: string) => {
@@ -191,6 +238,30 @@ const ClientDashboard: React.FC = () => {
                         >
                           <VisibilityIcon />
                         </Link>
+                        <Link
+                          to={`/events/${event.id}/edit`}
+                          className="action-button"
+                        >
+                          <EditIcon />
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm('Are you sure you want to delete this event?')) {
+                              try {
+                                await EventService.deleteEvent(event.id);
+                                // Refresh the events list
+                                const updatedEvents = events.filter(e => e.id !== event.id);
+                                setEvents(updatedEvents);
+                              } catch (err) {
+                                setError('Failed to delete event');
+                                console.error('Error deleting event:', err);
+                              }
+                            }
+                          }}
+                          className="action-button"
+                        >
+                          <DeleteIcon />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -203,6 +274,130 @@ const ClientDashboard: React.FC = () => {
                 <Link to="/events/create" className="btn-primary">
                   Create an Event
                 </Link>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="widget vendors-widget">
+          <div className="widget-header">
+            <h2>Vendors</h2>
+            <Link to="/vendors" className="view-all-link">
+              View All <ArrowForwardIcon />
+            </Link>
+          </div>
+
+          <div className="widget-content">
+            {loading ? (
+              <div className="loading-spinner">Loading...</div>
+            ) : vendors.length > 0 ? (
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vendors.map((vendor: User) => (
+                    <tr key={vendor.id}>
+                      <td>{`${vendor.firstName} ${vendor.lastName}`}</td>
+                      <td>{vendor.email}</td>
+                      <td>
+                        <Link
+                          to={`/vendors/${vendor.id}/edit`}
+                          className="action-button"
+                        >
+                          <EditIcon />
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm('Are you sure you want to delete this vendor?')) {
+                              try {
+                                await UserService.deleteUser(vendor.id);
+                                setVendors(vendors.filter((v: User) => v.id !== vendor.id));
+                              } catch (err) {
+                                setError('Failed to delete vendor');
+                                console.error('Error deleting vendor:', err);
+                              }
+                            }
+                          }}
+                          className="action-button"
+                        >
+                          <DeleteIcon />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="empty-state">
+                <PersonIcon />
+                <p>No vendors found</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="widget staff-widget">
+          <div className="widget-header">
+            <h2>Staff</h2>
+            <Link to="/staff" className="view-all-link">
+              View All <ArrowForwardIcon />
+            </Link>
+          </div>
+
+          <div className="widget-content">
+            {loading ? (
+              <div className="loading-spinner">Loading...</div>
+            ) : staff.length > 0 ? (
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {staff.map((staffMember: User) => (
+                    <tr key={staffMember.id}>
+                      <td>{`${staffMember.firstName} ${staffMember.lastName}`}</td>
+                      <td>{staffMember.email}</td>
+                      <td>
+                        <Link
+                          to={`/staff/${staffMember.id}/edit`}
+                          className="action-button"
+                        >
+                          <EditIcon />
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm('Are you sure you want to delete this staff member?')) {
+                              try {
+                                await UserService.deleteUser(staffMember.id);
+                                setStaff(staff.filter((s: User) => s.id !== staffMember.id));
+                              } catch (err) {
+                                setError('Failed to delete staff member');
+                                console.error('Error deleting staff member:', err);
+                              }
+                            }
+                          }}
+                          className="action-button"
+                        >
+                          <DeleteIcon />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="empty-state">
+                <PersonIcon />
+                <p>No staff members found</p>
               </div>
             )}
           </div>
@@ -231,7 +426,7 @@ const ClientDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.map((invoice) => (
+                  {invoices.map((invoice: Invoice) => (
                     <tr key={invoice.id}>
                       <td>INV-{invoice.id}</td>
                       <td>${invoice.totalAmount.toFixed(2)}</td>
@@ -275,6 +470,7 @@ const ClientDashboard: React.FC = () => {
         </div>
       </div>
 
+      {error && <div className="error-message">{error}</div>}
       <div className="dashboard-actions">
         <Link to="/events/create" className="action-card">
           <div className="action-icon">
